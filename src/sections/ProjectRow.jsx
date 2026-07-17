@@ -13,7 +13,10 @@ function ProjectRow({ project: p, isOpen, onToggle }) {
         }
       }}
     >
-      <div className="project-meta">{p.year}</div>
+      <div className="project-meta">
+        {p.year}
+        {p.logo && <img className="proj-logo" src={p.logo} alt="" />}
+      </div>
       <div className="project-main">
         <div className="proj-name">
           {p.name}

@@ -331,6 +331,14 @@ body::after {
     color: var(--fg-dimmer);
     letter-spacing: 0.02em;
     padding-top: 4px;
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+}
+.project-meta .proj-logo {
+    width: 76px;
+    height: auto;
+    margin: auto;
 }
 .project-main {
     min-width: 0;

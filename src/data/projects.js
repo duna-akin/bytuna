@@ -5,6 +5,7 @@ const PROJECTS = [
     id: "ghostnotes",
     year: "2026",
     name: "ghostnotes v1.0.2",
+    logo: "assets/ghostnotes-logo.png",
     blurb: "A CLI that lets you leave personal comments in code without the risk of pushing them to the remote. Built it because I was embarrassed of some of the notes I was leaving for myself on collaborative projects.",
     stack: ["python", "git"],
     star: "★ 6",
