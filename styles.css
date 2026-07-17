@@ -7,7 +7,7 @@
     --fg: #e6e6e6;
     --fg-dim: #8a8a8a;
     --fg-dimmer: #5a5a5a;
-    --accent-h: 75;
+    --accent-h: 253;
     --accent: oklch(0.8 0.14 var(--accent-h));
     --accent-dim: oklch(0.8 0.14 var(--accent-h) / 0.5);
     --accent-faint: oklch(0.8 0.14 var(--accent-h) / 0.12);

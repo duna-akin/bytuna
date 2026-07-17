@@ -1,5 +1,5 @@
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/ {
-  accentHue: 55,
+  accentHue: 253,
   textureMode: "both",
   scanIntensity: 25,
 }; /*EDITMODE-END*/
@@ -22,8 +22,8 @@ function App() {
           <TweakSlider
             label="hue"
             value={t.accentHue}
-            min={45}
-            max={95}
+            min={225}
+            max={265}
             step={1}
             onChange={(v) => setTweak("accentHue", v)}
           />
@@ -35,7 +35,7 @@ function App() {
               marginTop: -4,
             }}
           >
-            45 = orange · 75 = amber · 95 = yellow-green. stays warm.
+            225 = cyan-blue · 253 = blue · 265 = indigo. stays cool, trustworthy.
           </div>
         </TweakSection>
         <TweakSection label="Texture">
