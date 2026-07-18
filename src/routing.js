@@ -7,15 +7,12 @@ const HOME_ROUTE = "home";
 const PROJECTS_ROUTE = "projects";
 const BLOG_ROUTE = "blog";
 
-// pure: turns a raw location.hash string into { page, scrollTo }.
-// "contact" isn't its own page - contact lives on home - so it resolves to
-// home plus a hint to scroll the contact card into view.
+// pure: turns a raw location.hash string into { page }
 function parseHashRoute(hash) {
   const path = hash.replace(/^#\/?/, "");
-  if (path === "projects") return { page: PROJECTS_ROUTE, scrollTo: null };
-  if (path === "blog") return { page: BLOG_ROUTE, scrollTo: null };
-  if (path === "contact") return { page: HOME_ROUTE, scrollTo: "contact" };
-  return { page: HOME_ROUTE, scrollTo: null };
+  if (path === "projects") return { page: PROJECTS_ROUTE };
+  if (path === "blog") return { page: BLOG_ROUTE };
+  return { page: HOME_ROUTE };
 }
 
 // keeps route state in sync with the browser's hash, including
