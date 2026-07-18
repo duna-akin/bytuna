@@ -1,6 +1,6 @@
-function SectionHead({ cmd, id }) {
+function SectionHead({ cmd }) {
   return (
-    <div className="section-head" id={id}>
+    <div className="section-head">
       <span className="prompt">$</span>
       <span className="cmd">{cmd}</span>
       <span className="rule" />

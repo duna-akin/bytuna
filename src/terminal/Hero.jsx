@@ -74,7 +74,7 @@ function Hero() {
   }
 
   return (
-    <section className="hero shell" id="top">
+    <section className="hero shell">
       <div className="terminal" role="region" aria-label="terminal hero">
         <div className="terminal-titlebar">
           <div className="dots">
@@ -82,7 +82,7 @@ function Hero() {
             <span className="dot" />
             <span className="dot" />
           </div>
-          <span className="path">tuna@akin — ~/portfolio — zsh — 88×24</span>
+          <span className="path">bytuna@online — ~/website — zsh — 88×24</span>
           <span className="meta">v1.1</span>
         </div>
         <div className="terminal-body" onClick={() => inputRef.current?.focus()}>
@@ -98,20 +98,14 @@ function Hero() {
             }
           />
           <div className="line out">
-            Based in Pennsylvania. Senior in college. Currently
-          </div>
-          <div className="line out">
-            interning at Merck and building my own venture.
-          </div>
-          <div className="line out">
-            hit me up if you want to collaborate or talk
+            Based in Pennsylvania. Senior in college. Currently interning at
+            Merck and building my own venture. hit me up if you want to
+            collaborate or talk
           </div>
           <div className="blank" />
           <div className="line out dim">
-            I like coding, well-named things, and ideas that
-          </div>
-          <div className="line out dim">
-            surpasses the person who initially thought of them
+            I like coding, well-named things, and ideas that surpasses the
+            person who initially thought of them
           </div>
           <div className="blank" />
 
@@ -124,7 +118,7 @@ function Hero() {
           />
           <div className="line out">
             <span className="k">drwxr-xr-x</span>{" "}
-            <span style={{ color: "var(--accent)" }}>projects/</span>
+            <span style={{ color: "var(--accent)" }}>projects/</span>{" "}
             things i built / building
           </div>
           <div className="line out">
@@ -149,9 +143,9 @@ function Hero() {
 
           <div className="prompt-input-row">
             <span className="prompt-line">
-              <span className="user">tuna</span>
+              <span className="user">bytuna</span>
               <span className="at">@</span>
-              <span className="host">akin</span>
+              <span className="host">online</span>
               <span className="dollar">$</span>
             </span>
             <input

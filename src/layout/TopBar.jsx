@@ -2,20 +2,20 @@ function TopBar() {
   return (
     <div className="topbar">
       <div className="topbar-inner">
-        <div className="brand">
+        <a className="brand" href="#/">
           <span className="accent">bytuna</span>
           <span className="at">@</span>
           <span className="host">online</span>
-        </div>
+        </a>
         <nav className="navlinks">
-          <a href="#projects">
+          <a href="#/">
+            <span className="hash">/</span>home
+          </a>
+          <a href="#/projects">
             <span className="hash">/</span>projects
           </a>
-          <a href="#blog">
+          <a href="#/blog">
             <span className="hash">/</span>blog
-          </a>
-          <a href="#contact">
-            <span className="hash">/</span>contact
           </a>
         </nav>
       </div>

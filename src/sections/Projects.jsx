@@ -4,7 +4,7 @@ function Projects() {
 
   return (
     <section className="section shell">
-      <SectionHead cmd="ls projects/" id="projects" />
+      <SectionHead cmd="ls projects/" />
       <div className="projects">
         {PROJECTS.map((p) => (
           <ProjectRow

@@ -4,17 +4,42 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/ {
   scanIntensity: 25,
 }; /*EDITMODE-END*/
 
+// picks the page's content for the current route - home keeps the
+// terminal + contact together, projects/blog get a page to themselves
+function renderPage(route) {
+  switch (route.page) {
+    case PROJECTS_ROUTE:
+      return <Projects />;
+    case BLOG_ROUTE:
+      return <Blog />;
+    default:
+      return (
+        <>
+          <Hero />
+          <Contact />
+        </>
+      );
+  }
+}
+
+// a real page load always starts scrolled to the top; swapping content
+// via JS doesn't, so we do it by hand on every route change
+function useScrollOnRouteChange(route) {
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [route.page]);
+}
+
 function App() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
   useApplyThemeVars(t);
+  const route = usePageRoute();
+  useScrollOnRouteChange(route);
 
   return (
     <>
       <TopBar />
-      <Hero />
-      <Projects />
-      <Blog />
-      <Contact />
+      {renderPage(route)}
       <Footer />
 
       <TweaksPanel title="Tweaks">

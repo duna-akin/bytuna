@@ -1,7 +1,7 @@
 function Contact() {
   return (
     <section className="section shell">
-      <SectionHead cmd="cat contact.txt" id="contact" />
+      <SectionHead cmd="cat contact.txt" />
       <div className="contact-card">
         <div className="contact-field">
           <div className="k">email</div>
@@ -21,7 +21,9 @@ function Contact() {
         </div>
         <div className="contact-field">
           <div className="k">elsewhere</div>
-          <div className="v dim">not on twitter.</div>
+          <div className="v">
+            <a href="https://www.linkedin.com/in/tuna-akin/">linkedin.com/in/tuna-akin</a>
+          </div>
         </div>
         <div className="availability">
           <span className="pulse" />

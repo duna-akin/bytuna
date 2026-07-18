@@ -109,6 +109,7 @@ body::after {
 .brand {
     color: var(--fg);
     letter-spacing: -0.01em;
+    text-decoration: none;
 }
 .brand .at {
     color: var(--fg-dim);
@@ -197,6 +198,7 @@ body::after {
 .terminal-titlebar .dots {
     display: flex;
     gap: 6px;
+    flex-shrink: 0;
 }
 .terminal-titlebar .dot {
     width: 9px;
@@ -207,9 +209,15 @@ body::after {
 .terminal-titlebar .path {
     margin-left: 8px;
     letter-spacing: 0.02em;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 .terminal-titlebar .meta {
     margin-left: auto;
+    flex-shrink: 0;
 }
 
 .terminal-body {
@@ -291,6 +299,7 @@ body::after {
     font-family: var(--mono);
     font-size: 13.5px;
     flex: 1;
+    min-width: 0;
     padding: 0;
     margin-left: 2px;
     caret-color: var(--accent);
@@ -435,10 +444,6 @@ body::after {
     font-family: var(--mono);
     font-size: 11.5px;
 }
-.proj-detail .lessons b {
-    color: var(--fg);
-    font-weight: 500;
-}
 
 /* ---------- blog ---------- */
 .posts {
@@ -576,13 +581,6 @@ footer {
 footer .right {
     display: flex;
     gap: 18px;
-}
-footer a {
-    color: var(--fg-dim);
-    text-decoration: none;
-}
-footer a:hover {
-    color: var(--fg);
 }
 
 /* ---------- focus / a11y ---------- */
