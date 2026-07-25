@@ -8,7 +8,7 @@ function renderTerminalOutput(result) {
         </span>
       );
     case "whoami":
-      return <span className="out">tuna akin, junior tech enthusiast</span>;
+      return <span className="out">tuna akin, technology enthusiast</span>;
     case "ls":
       return (
         <span className="out">
@@ -20,8 +20,7 @@ function renderTerminalOutput(result) {
     case "about":
       return (
         <span className="out dim">
-          Pennsylvania. Senior in college. Currently interning for Merck and
-          developing a venture. Open to collaboration
+          i am senior in college currently interning for Merck and developing a venture.
         </span>
       );
     case "contact":
@@ -87,7 +86,7 @@ function Hero() {
         </div>
         <div className="terminal-body" onClick={() => inputRef.current?.focus()}>
           <PromptLine cmd="whoami" />
-          <div className="line out">tuna akin, junior tech enthusiast</div>
+          <div className="line out">tuna akin, tech enthusiast</div>
           <div className="blank" />
 
           <PromptLine
@@ -98,14 +97,11 @@ function Hero() {
             }
           />
           <div className="line out">
-            Based in Pennsylvania. Senior in college. Currently interning at
-            Merck and building my own venture. hit me up if you want to
-            collaborate or talk
+            senior in college interning at Merck and building my own venture. hit me up if you want to collab or talk
           </div>
           <div className="blank" />
           <div className="line out dim">
-            I like coding, well-named things, and ideas that surpasses the
-            person who initially thought of them
+            I like engineering, well-named things, and ideas that surpasses the person who initially thought of them
           </div>
           <div className="blank" />
 

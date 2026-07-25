@@ -17,7 +17,7 @@ function Contact() {
         </div>
         <div className="contact-field">
           <div className="k">based in</div>
-          <div className="v dim">PA</div>
+          <div className="v dim">earth (PA - NY)</div>
         </div>
         <div className="contact-field">
           <div className="k">elsewhere</div>
