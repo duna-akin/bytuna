@@ -1,0 +1,852 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>tuna — scroll mockup v17</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root { --bg: #03141c; --ink: #cfe7e6; --dim: #5f8a8c; --accent: #7ff0e4; --sand-ink: #7a6448; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { background: var(--bg); }
+  body { background: var(--bg); color: var(--ink); font-family: "Fraunces", serif; overflow-x: hidden; }
+  canvas#water { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; }
+
+  main { position: relative; z-index: 1; }
+  .hero {
+    height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    pointer-events: none; padding: 0 16px;
+  }
+  h1 {
+    font-weight: 700; letter-spacing: -0.015em;
+    font-size: clamp(96px, 28vw, 420px); line-height: .9;
+    margin-top: -6vh; padding: 0 .08em;
+    color: var(--accent);
+    pointer-events: auto; touch-action: none;
+    user-select: none; -webkit-user-select: none;
+  }
+  .gl h1 { color: transparent; }
+
+  .entry {
+    width: min(560px, 100%);
+    margin-top: clamp(8px, 3vh, 36px);
+    font-size: clamp(15px, 1.25vw, 18px); line-height: 1.5;
+  }
+  .entry .head { display: flex; gap: .7em; align-items: baseline; margin-bottom: .55em; }
+  .entry .word { font-weight: 700; font-size: 1.15em; }
+  .entry .pron, .entry .pos { color: var(--dim); font-style: italic; }
+  .entry ol { list-style: none; counter-reset: def; }
+  .entry li { counter-increment: def; display: grid; grid-template-columns: 1.6em 1fr; color: var(--dim); }
+  .entry li::before { content: counter(def) "."; font-family: "JetBrains Mono", monospace; font-size: .8em; padding-top: .25em; }
+  .entry li.me { color: var(--ink); }
+  .entry .lang { font-style: italic; }
+  .here {
+    font-family: "JetBrains Mono", monospace; font-size: .72em; color: var(--accent);
+    white-space: nowrap; margin-left: .6em; display: inline-block;
+    animation: nudge 1.6s ease-in-out infinite;
+  }
+  @keyframes nudge { 50% { transform: translateX(-5px); } }
+
+  .passage { height: 40vh; }
+
+  .beach { position: relative; height: 100vh; }
+  .carve {
+    position: absolute; font-family: "Caveat", cursive; font-weight: 700;
+    font-size: clamp(64px, 8.5vw, 132px); line-height: 1; padding: .02em .14em;
+    color: var(--sand-ink); text-decoration: none;
+    transform: translate(-50%, -50%) rotate(var(--r));
+  }
+  .carve:focus-visible, .bottle:focus-visible { outline: 2px dashed rgba(122, 100, 72, .6); outline-offset: 6px; border-radius: 8px; }
+  .gl .carve { color: transparent; }
+  #gh { left: 30%; top: 56%; --r: -4deg; }
+  #li { left: 60%; top: 74%; --r: 3deg; }
+  .bottle {
+    position: absolute; left: 74%; top: 40%; transform: translate(-50%, -50%) rotate(-20deg);
+    width: clamp(120px, 11vw, 176px); height: clamp(52px, 4.8vw, 76px);
+    display: flex; align-items: center; justify-content: center;
+    font-family: "JetBrains Mono", monospace; font-size: 14px; color: var(--sand-ink); text-decoration: none;
+  }
+  .gl .bottle span { visibility: hidden; }
+  .addr {
+    position: absolute; left: 74%; top: calc(40% + clamp(48px, 5vw, 72px)); transform: translateX(-50%);
+    font-family: "JetBrains Mono", monospace; font-size: 13px; letter-spacing: .02em; color: #5e4a31;
+    opacity: 0; transition: opacity .5s, transform .5s; pointer-events: none; white-space: nowrap;
+  }
+  .bottle:hover ~ .addr, .bottle:focus-visible ~ .addr { opacity: .9; transform: translateX(-50%) translateY(4px); }
+
+  @media (max-width: 640px) {
+    h1 { margin-top: -8vh; font-size: 37vw; }
+    .entry { font-size: 16px; }
+    #gh { left: 36%; top: 54%; }
+    #li { left: 56%; top: 72%; }
+    .bottle { left: 66%; top: 38%; }
+    .addr { left: 50%; top: calc(38% + 52px); }
+  }
+  @media (prefers-reduced-motion: reduce) { .here { animation: none; } }
+</style>
+</head>
+<body>
+  <canvas id="water" aria-hidden="true"></canvas>
+
+  <main>
+    <section class="hero">
+      <h1 id="name">tuna</h1>
+      <section class="entry" aria-label="definition">
+        <div class="head"><span class="word">tu·na</span><span class="pron">/ˈtuː.nə/</span><span class="pos">noun</span></div>
+        <ol>
+          <li><span>a large, fast, restless fish.</span></li>
+          <li><span><span class="lang">Turkish.</span> the Danube, Europe's second-longest river.</span></li>
+          <li class="me"><span>Tuna Akın, student @ Laf who builds things.<span class="here">← you are here</span></span></li>
+        </ol>
+      </section>
+    </section>
+
+    <div class="passage" aria-hidden="true"></div>
+
+    <section class="beach" id="beach" aria-label="find me">
+      <a class="carve" id="gh" href="https://github.com/duna-akin">github</a>
+      <a class="carve" id="li" href="https://www.linkedin.com/in/tuna-akin/">linkedin</a>
+      <a class="bottle" id="mail" href="mailto:tuna.akin@protonmail.com" aria-label="email tuna.akin@protonmail.com"><span>✉ email</span></a>
+      <p class="addr">tuna.akin@protonmail.com</p>
+    </section>
+  </main>
+
+<script>
+(() => {
+  const T = { bg0:"#03141c", bg1:"#07303d", caus:"#5fe3d6", causBg:.16, causText:.9,
+              text:"#0b5e66", text2:"#93f7ec", fish:"#9cc4c6", glow:"#1fb5aa", glowAmt:.32,
+              spec:1.1, disp:.22, textA:.9, refract:55, grain:.035, vig:.9 };
+
+  const canvas = document.getElementById("water");
+  const gl = canvas.getContext("webgl2", { alpha: false, antialias: false, premultipliedAlpha: false, powerPreference: "high-performance" });
+  if (!gl) return; // plain HTML stays visible and usable
+  gl.getExtension("EXT_color_buffer_float");
+  gl.getExtension("EXT_color_buffer_half_float");
+
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const coarse = matchMedia("(pointer: coarse)").matches;
+
+  const FLUID = {
+    simRes: coarse ? 96 : 128, mapRes: coarse ? 320 : 512, pressureIters: coarse ? 14 : 22,
+    curl: 12, velDissipation: 1.6, force: 2600, radius: .0013,
+  };
+
+  // ---------------------------------------------------------------- shaders
+  const VS = `#version 300 es
+in vec2 a; uniform vec2 texel; out vec2 vUv, vL, vR, vT, vB;
+void main(){
+  vUv = a * .5 + .5;
+  vL = vUv - vec2(texel.x, 0.); vR = vUv + vec2(texel.x, 0.);
+  vT = vUv + vec2(0., texel.y); vB = vUv - vec2(0., texel.y);
+  gl_Position = vec4(a, 0., 1.);
+}`;
+  const HEAD = `#version 300 es
+precision highp float; precision highp sampler2D;
+in vec2 vUv, vL, vR, vT, vB; out vec4 o;
+`;
+  const SPLAT = HEAD + `uniform sampler2D uTarget; uniform float aspect, radius; uniform vec2 point; uniform vec3 value;
+void main(){ vec2 p = vUv - point; p.x *= aspect; o = vec4(texture(uTarget, vUv).xyz + exp(-dot(p, p) / radius) * value, 1.); }`;
+  const ADVECT = HEAD + `uniform sampler2D uVelocity, uSource; uniform vec2 texel; uniform float dt, dissipation;
+void main(){ vec2 c = vUv - dt * texture(uVelocity, vUv).xy * texel; o = vec4(texture(uSource, c).xy / (1. + dissipation * dt), 0., 1.); }`;
+  const DIVERGENCE = HEAD + `uniform sampler2D uVelocity;
+void main(){
+  float L = texture(uVelocity, vL).x, R = texture(uVelocity, vR).x, T = texture(uVelocity, vT).y, B = texture(uVelocity, vB).y;
+  vec2 C = texture(uVelocity, vUv).xy;
+  if (vL.x < 0.) L = -C.x; if (vR.x > 1.) R = -C.x; if (vT.y > 1.) T = -C.y; if (vB.y < 0.) B = -C.y;
+  o = vec4(.5 * (R - L + T - B), 0., 0., 1.);
+}`;
+  const CURL = HEAD + `uniform sampler2D uVelocity;
+void main(){
+  float L = texture(uVelocity, vL).y, R = texture(uVelocity, vR).y, T = texture(uVelocity, vT).x, B = texture(uVelocity, vB).x;
+  o = vec4(.5 * (R - L - T + B), 0., 0., 1.);
+}`;
+  const VORTICITY = HEAD + `uniform sampler2D uVelocity, uCurl; uniform float curl, dt;
+void main(){
+  float L = texture(uCurl, vL).x, R = texture(uCurl, vR).x, T = texture(uCurl, vT).x, B = texture(uCurl, vB).x, C = texture(uCurl, vUv).x;
+  vec2 f = .5 * vec2(abs(T) - abs(B), abs(R) - abs(L));
+  f /= length(f) + 1e-4; f *= curl * C; f.y *= -1.;
+  o = vec4(clamp(texture(uVelocity, vUv).xy + f * dt, -1000., 1000.), 0., 1.);
+}`;
+  const PRESSURE = HEAD + `uniform sampler2D uPressure, uDivergence;
+void main(){
+  float L = texture(uPressure, vL).x, R = texture(uPressure, vR).x, T = texture(uPressure, vT).x, B = texture(uPressure, vB).x;
+  o = vec4((L + R + B + T - texture(uDivergence, vUv).x) * .25, 0., 0., 1.);
+}`;
+  const GRADIENT = HEAD + `uniform sampler2D uPressure, uVelocity;
+void main(){
+  float L = texture(uPressure, vL).x, R = texture(uPressure, vR).x, T = texture(uPressure, vT).x, B = texture(uPressure, vB).x;
+  o = vec4(texture(uVelocity, vUv).xy - vec2(R - L, T - B), 0., 1.);
+}`;
+  const SCALE = HEAD + `uniform sampler2D uTexture; uniform float value;
+void main(){ o = value * texture(uTexture, vUv); }`;
+  const INK = HEAD + `uniform sampler2D uVelocity, uDisp; uniform vec2 velTexel; uniform float dt, relax;
+void main(){
+  vec2 c = vUv - dt * texture(uVelocity, vUv).xy * velTexel;
+  vec2 d = texture(uDisp, c).xy + (c - vUv);
+  o = vec4(d * relax, 0., 1.);
+}`;
+
+  // The whole world in one pass. Screen point p looks at world point w = p + (0, scroll).
+  // World, top to bottom: deep river (the name) -> shallows -> shoreline -> beach.
+  const SCENE = HEAD + `
+uniform sampler2D uTex, uDispMap, uBeachTex;
+uniform vec2 uSize; uniform float uGlDpr, uTime, uFlow, uScroll, uNameVis;
+uniform float uShore, uDeepEnd, uBeachTop;
+uniform vec4 uHoverRect; uniform float uHoverAmt;
+uniform vec4 uBottle; uniform float uBottleScale;
+uniform vec4 uRip[16];
+uniform vec3 uFish[12];
+uniform float uFishOn;
+uniform vec3 uBg0, uBg1, uText, uText2, uCaus, uFishCol, uGlow;
+uniform float uCausBg, uCausText, uSpec, uDisp, uTextA, uRefract, uGlowAmt, uGrain, uVig;
+
+const vec3 LIGHT = vec3(-.4472, -.6261, .5367); // normalize(-.5, -.7, .6)
+
+float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float noise(vec2 p){
+  vec2 i = floor(p), f = fract(p);
+  vec2 u = f*f*f*(f*(f*6.-15.)+10.);
+  return mix(mix(hash(i), hash(i+vec2(1,0)), u.x), mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), u.x), u.y);
+}
+float hash2(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
+float noise2(vec2 p){
+  vec2 i = floor(p), f = fract(p);
+  vec2 u = f*f*(3. - 2.*f);
+  return mix(mix(hash2(i), hash2(i+vec2(1,0)), u.x), mix(hash2(i+vec2(0,1)), hash2(i+vec2(1,1)), u.x), u.y);
+}
+float fbm2(vec2 p){ // rotated octaves hide the grid
+  float v = 0., a = .5; mat2 m = mat2(.8, .6, -.6, .8);
+  for (int i = 0; i < 4; i++) { v += a * noise2(p); p = m * p * 2.03; a *= .5; }
+  return v;
+}
+float smin(float a, float b, float k){ float h = clamp(.5 + .5*(b - a)/k, 0., 1.); return mix(b, a, h) - k*h*(1. - h); }
+mat2 rot(float a){ float c = cos(a), s = sin(a); return mat2(c, s, -s, c); }
+
+float H(vec2 p){
+  vec2 q = p / 280.;
+  float h = noise(q + vec2(-uFlow*.10, 0.)) * .6
+          + noise(q*2.3 + vec2(5.2, 1.3) + vec2(-uFlow*.17, uFlow*.02)) * .28
+          + noise(q*5.1 + vec2(1.7, 9.2) + vec2(-uFlow*.31, 0.)) * .12;
+  h *= 26.;
+  for (int i = 0; i < 16; i++) {
+    vec4 r = uRip[i];
+    float age = uTime - r.z;
+    if (age < 0. || age > 3.5) continue;
+    float d = length(p - r.xy);
+    float x = d - age * 300.;
+    float s = 26. + age * 30.;
+    h += r.w * 5.5 * sin(x * .075) * exp(-x*x / (2.*s*s)) * exp(-age*1.1) / (1. + d*.004);
+  }
+  return h;
+}
+float caustic(vec2 uv, float t){
+  vec2 p = mod(uv * 6.28318, 6.28318) - 250.;
+  vec2 i = p; float c = 1.; float inten = .005;
+  for (int n = 0; n < 4; n++) {
+    float tt = t * (1. - (3.5 / float(n+1)));
+    i = p + vec2(cos(tt - i.x) + sin(tt + i.y), sin(tt - i.y) + cos(tt + i.x));
+    c += 1. / length(vec2(p.x / (sin(i.x + tt) / inten), p.y / (cos(i.y + tt) / inten)));
+  }
+  c /= 4.; c = 1.17 - pow(c, 1.4);
+  return pow(abs(c), 8.);
+}
+float seg(vec2 p, vec2 a, vec2 b, float ra, float rb){
+  vec2 pa = p - a, ba = b - a;
+  float t = clamp(dot(pa, ba) / max(dot(ba, ba), 1e-4), 0., 1.);
+  return length(pa - ba*t) - mix(ra, rb, t);
+}
+float fishD(vec2 p){
+  float d = 1e5;
+  for (int i = 0; i < 7; i++) d = min(d, seg(p, uFish[i].xy, uFish[i+1].xy, uFish[i].z, uFish[i+1].z));
+  d = min(d, seg(p, uFish[7].xy, uFish[8].xy, uFish[7].z, uFish[8].z));
+  d = min(d, seg(p, uFish[7].xy, uFish[9].xy, uFish[7].z, uFish[9].z));
+  d = min(d, seg(p, uFish[2].xy, uFish[10].xy, uFish[2].z*.35, uFish[10].z));
+  d = min(d, seg(p, uFish[2].xy, uFish[11].xy, uFish[2].z*.35, uFish[11].z));
+  return d;
+}
+float letters(vec2 q, float k){
+  vec4 s = texture(uTex, q / uSize);
+  return mix(s.r, min(1., s.g * 1.15), k);
+}
+
+// ---- shoreline: waves lap in and out; every ~14s a bigger one runs further up the sand
+float swash(float t){ return 46. * pow(max(0., sin(t * .45)), 3.) + 10. * sin(t * 1.3); }
+float shoreBase(float x, float t){ return uShore + 16. * sin(x / 170. + t * .7) + 8. * sin(x / 63. - t * 1.1); }
+float shoreAt(float x, float t){ return shoreBase(x, t) + swash(t); }
+// how far up the beach the water has been lately (wet sand, washed carvings)
+float reachAt(float x, float t){ return max(shoreAt(x, t), shoreBase(x, t) + swash(t - 1.6) - 4.); }
+
+vec3 sand(vec2 w){
+  float n = fbm2(w / 110.) * .75 + noise2(w / 9.) * .25;
+  vec3 c = mix(vec3(.80, .71, .55), vec3(.92, .86, .72), n);
+  return c * (.95 + .09 * hash(floor(w)));
+}
+
+// ---- the bottle, in its own frame: +x toward the cork, units ~ px at scale 1
+float bottleD(vec2 lp){
+  float b = seg(lp, vec2(-44., 0.), vec2(14., 0.), 17., 17.);
+  b = smin(b, seg(lp, vec2(14., 0.), vec2(34., 0.), 17., 7.), 7.);
+  b = smin(b, seg(lp, vec2(34., 0.), vec2(52., 0.), 6.5, 6.5), 3.);
+  b = min(b, seg(lp, vec2(50., 0.), vec2(53.5, 0.), 8., 8.));
+  return b;
+}
+float corkD(vec2 lp){ return seg(lp, vec2(53.5, 0.), vec2(63., 0.), 6., 6.3); }
+
+void main(){
+  vec2 p = vec2(gl_FragCoord.x, uSize.y*uGlDpr - gl_FragCoord.y) / uGlDpr;
+  vec2 w = p + vec2(0., uScroll);
+  float t = uTime;
+
+  float sy = shoreAt(w.x, t);
+  float edge = sy - w.y;                         // > 0 in water
+  float water = smoothstep(-1.5, 1.5, edge);
+
+  float e = 1.5;
+  float h0 = H(w);
+  vec2 g = vec2(H(w + vec2(e, 0.)) - h0, H(w + vec2(0., e)) - h0) / e;
+  vec2 off = g * uRefract * water;
+
+  // ---- water: deep teal over the river, clear turquoise over sand near the shore
+  float depth = clamp(edge / max(sy - uDeepEnd, 1.), 0., 1.);
+  float cz = caustic((w + off*1.5) / 420., t*.35 + 23.);
+  vec3 deepC = mix(uBg0, uBg1, smoothstep(0., 1., p.y / uSize.y)) + uCaus * cz * uCausBg;
+  vec3 bottom = sand(w + off * 1.4) * vec3(.74, .86, .84);
+  vec3 shallowC = mix(bottom * (.78 + cz * 1.15), vec3(.2, .66, .66), .26);
+  vec3 waterC = mix(shallowC, deepC, smoothstep(0., 1., pow(depth, .55)));
+  float foam = smoothstep(16., 0., edge) * (.55 + .45 * fbm2(w / 10. + vec2(t * .9, 0.)));
+  foam += smoothstep(.52, .7, fbm2(w / 22. + vec2(t * .25, t * .4))) * smoothstep(80., 8., edge) * .4;
+  waterC = mix(waterC, vec3(.95, .98, .97), clamp(foam, 0., 1.) * .85);
+
+  // ---- beach: dry sand, darker where the last waves reached
+  float reach = reachAt(w.x, t);
+  vec3 sandC = sand(w) * mix(1., .76, smoothstep(70., 0., w.y - reach));
+  vec3 col = mix(sandC, waterC, water);
+
+  // ---- words written in the sand (R crisp, G soft)
+  if (w.y > uBeachTop - 20.) {
+    vec2 bu = vec2(w.x / uSize.x, (w.y - uBeachTop) / uSize.y) + off / uSize * .6;
+    vec4 bt = texture(uBeachTex, bu);
+    if (bt.g > .002) {
+      vec2 px = 1.5 / uSize;
+      vec2 gt = vec2(texture(uBeachTex, bu + vec2(px.x, 0.)).g - texture(uBeachTex, bu - vec2(px.x, 0.)).g,
+                     texture(uBeachTex, bu + vec2(0., px.y)).g - texture(uBeachTex, bu - vec2(0., px.y)).g);
+      float washed = smoothstep(-10., 40., reach - w.y);       // waves soften the carving
+      vec4 hr = uHoverRect;
+      float hov = uHoverAmt * step(hr.x, w.x) * step(w.x, hr.z) * step(hr.y, w.y) * step(w.y, hr.w);
+      float carve = (1. - .7 * washed) * (1. + .8 * hov);
+      vec3 n = normalize(vec3(gt * 2.6 * carve, 1.));
+      float shade = 1. + (dot(n, LIGHT) - LIGHT.z) * .9;      // walls of the groove catch / lose light
+      col *= clamp(shade, .72, 1.18);
+      col *= 1. - (bt.r * .1 + bt.g * .06) * carve;              // damp, shadowed groove floor
+    }
+  }
+
+  // ---- message in a bottle
+  {
+    vec4 B = uBottle;
+    float sc = uBottleScale * (1. + .07 * B.w);
+    mat2 toLocal = rot(-B.z);
+    vec2 lp = toLocal * (w - B.xy) / sc;
+    vec2 so = toLocal * vec2(9. + B.w * 12., 13. + B.w * 16.) / sc;
+    float ds = bottleD(lp - so) * sc;
+    col *= 1. - .33 * smoothstep(10. + B.w * 8., -6., ds);
+    float dg = bottleD(lp) * sc, dc = corkD(lp) * sc;
+    if (min(dg, dc) < 2.) {
+      vec2 gl2 = vec2(bottleD(lp + vec2(.5, 0.)) - bottleD(lp), bottleD(lp + vec2(0., .5)) - bottleD(lp)) * 2.;
+      vec2 gw = rot(B.z) * gl2;
+      float inside = clamp(-dg / (17. * sc), 0., 1.);
+      vec3 n = normalize(vec3(gw * (1. - inside) * 1.8, .4 + inside));
+      vec3 behind = mix(sandC, waterC, water * .7);
+      behind = mix(behind, sand(w + gw * 16.), .5);
+      vec3 glass = mix(behind, vec3(.5, .8, .72), .42);
+      float paper = smoothstep(1., -1., seg(lp, vec2(-36., 1.5), vec2(12., 1.5), 8.5, 8.5) * sc);
+      glass = mix(glass, vec3(.96, .92, .82), paper * .78);
+      glass = mix(glass, vec3(.55, .32, .2), paper * smoothstep(2., .8, abs(lp.x + 10.)) * .7);
+      float diff = .78 + .32 * dot(n, LIGHT);
+      float spec = pow(max(dot(reflect(-LIGHT, n), vec3(0., 0., 1.)), 0.), 28.) * .95;
+      float rim = smoothstep(-3.5, 0., dg) * .32;
+      glass = glass * diff + spec + rim;
+      col = mix(col, glass, smoothstep(1., -1., dg) * .93);
+      vec3 cork = vec3(.6, .43, .27) * (.78 + .35 * noise(lp * .7)) * (.82 + .3 * dot(n, LIGHT));
+      col = mix(col, cork, smoothstep(1., -1., dc));
+    }
+  }
+
+  // ---- the fish, a quiet silhouette in the river
+  if (uFishOn > .5) {
+    float fd = fishD(w + off*.6);
+    col = mix(col, uFishCol * (.85 + .25*cz), smoothstep(1., -1., fd) * .55 * water);
+  }
+
+  // ---- the name, made of water; the current carries it off as you scroll away
+  if (uNameVis > .001) {
+    vec2 dd = texture(uDispMap, vec2(p.x / uSize.x, 1. - p.y / uSize.y)).xy;
+    vec2 dpx = vec2(dd.x * uSize.x, -dd.y * uSize.y);
+    float dm = length(dpx);
+    float k = smoothstep(4., 90., dm);
+    vec2 q = p + off + dpx + vec2(0., uScroll);
+    vec2 uv = q / uSize;
+    vec4 t0 = texture(uTex, uv);
+    col += uGlow * t0.b * uGlowAmt * uNameVis;
+    float mr = letters(q - off*uDisp, k), mg = letters(q, k), mb = letters(q + off*uDisp, k);
+    vec2 px = 1. / uSize;
+    float gx = texture(uTex, uv + vec2(2., 0.)*px).g - texture(uTex, uv - vec2(2., 0.)*px).g;
+    float gy = texture(uTex, uv + vec2(0., 2.)*px).g - texture(uTex, uv - vec2(0., 2.)*px).g;
+    vec3 N = normalize(vec3(-g*.9 - vec2(gx, gy)*6.*(1. - .7*k), 1.));
+    float diff = clamp(dot(N, LIGHT), 0., 1.);
+    float spec = pow(clamp(dot(reflect(-LIGHT, N), vec3(0., 0., 1.)), 0., 1.), 40.);
+    float stretch = length(vec2(length(dFdx(dpx)), length(dFdy(dpx)))) / uGlDpr;
+    float dilute = (1. - .75 * smoothstep(30., 260., dm)) / (1. + .45 * stretch);
+    vec3 tc = mix(uText, uText2, diff * (1. - .55*k)) + (uCaus*cz*uCausText + spec*uSpec) * (1. - .6*k);
+    col = mix(col, tc, vec3(mr, mg, mb) * uTextA * dilute * uNameVis);
+  }
+
+  vec3 Nw = normalize(vec3(-g*1.4, 1.));
+  col += pow(clamp(dot(reflect(-LIGHT, Nw), vec3(0., 0., 1.)), 0., 1.), 90.) * uSpec * .35 * water;
+
+  vec2 vq = p / uSize - .5;
+  col *= mix(1., .8, clamp(length(vq * vec2(1., .8)) * uVig, 0., 1.));
+  col += (hash(p + fract(uTime)*100.) - .5) * uGrain;
+  o = vec4(col, 1.);
+}`;
+
+  // ---------------------------------------------------------------- gl plumbing
+  function compile(type, src) {
+    const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+    return s;
+  }
+  function program(fs) {
+    const p = gl.createProgram();
+    gl.attachShader(p, compile(gl.VERTEX_SHADER, VS));
+    gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fs));
+    gl.bindAttribLocation(p, 0, "a");
+    gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+    const u = {};
+    const n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS);
+    for (let i = 0; i < n; i++) {
+      const name = gl.getActiveUniform(p, i).name.replace(/\[0\]$/, "");
+      u[name] = gl.getUniformLocation(p, name);
+    }
+    return { p, u };
+  }
+
+  let P;
+  try {
+    P = {
+      splat: program(SPLAT), advect: program(ADVECT), divergence: program(DIVERGENCE), curl: program(CURL),
+      vorticity: program(VORTICITY), pressure: program(PRESSURE), gradient: program(GRADIENT),
+      scale: program(SCALE), ink: program(INK), scene: program(SCENE),
+    };
+  } catch (err) { console.error(err); return; }
+  document.body.classList.add("gl");
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(0);
+  gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+  function texture(w, h, internal, format, type, data) {
+    const t = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, t);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texImage2D(gl.TEXTURE_2D, 0, internal, w, h, 0, format, type, data || null);
+    return t;
+  }
+  function target(w, h) {
+    const tex = texture(w, h, gl.RGBA16F, gl.RGBA, gl.HALF_FLOAT);
+    const fbo = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+    const ok = gl.checkFramebufferStatus(gl.FRAMEBUFFER) === gl.FRAMEBUFFER_COMPLETE;
+    gl.viewport(0, 0, w, h); gl.clearColor(0, 0, 0, 1); gl.clear(gl.COLOR_BUFFER_BIT);
+    return { tex, fbo, w, h, texel: [1 / w, 1 / h], ok };
+  }
+  function pingpong(w, h) {
+    const t = { read: target(w, h), write: target(w, h), w, h, texel: [1 / w, 1 / h] };
+    t.ok = t.read.ok && t.write.ok;
+    t.swap = () => { const r = t.read; t.read = t.write; t.write = r; };
+    return t;
+  }
+  function bind(unit, tex) { gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, tex); return unit; }
+  function run(prog, dest, texel) {
+    gl.useProgram(prog.p);
+    if (prog.u.texel) gl.uniform2fv(prog.u.texel, texel || dest.texel);
+    if (dest) { gl.bindFramebuffer(gl.FRAMEBUFFER, dest.fbo); gl.viewport(0, 0, dest.w, dest.h); }
+    else { gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.viewport(0, 0, canvas.width, canvas.height); }
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+  }
+  function use(prog) { gl.useProgram(prog.p); return prog.u; }
+
+  // ---------------------------------------------------------------- fluid (stirs the name)
+  let vel, prs, div, crl, ink, fluidOK = false;
+  const zeroTex = texture(1, 1, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
+  function gridFor(res) {
+    const aspect = W / Hh;
+    return aspect >= 1 ? [Math.round(res * aspect), res] : [res, Math.round(res / aspect)];
+  }
+  function initFluid() {
+    for (const t of [vel, prs, ink]) if (t) for (const s of [t.read, t.write]) { gl.deleteTexture(s.tex); gl.deleteFramebuffer(s.fbo); }
+    for (const s of [div, crl]) if (s) { gl.deleteTexture(s.tex); gl.deleteFramebuffer(s.fbo); }
+    const [sw, sh] = gridFor(FLUID.simRes), [mw, mh] = gridFor(FLUID.mapRes);
+    vel = pingpong(sw, sh); prs = pingpong(sw, sh); div = target(sw, sh); crl = target(sw, sh);
+    ink = pingpong(mw, mh);
+    fluidOK = vel.ok && prs.ok && div.ok && crl.ok && ink.ok;
+    if (!fluidOK) console.warn("float render targets unavailable; stirring disabled");
+  }
+  const splats = [];
+  function splat(x, y, vx, vy, radius) { splats.push([x, y, vx, vy, radius || FLUID.radius]); }
+
+  function stepFluid(dt, calm) {
+    if (!fluidOK) return;
+    gl.disable(gl.BLEND);
+    let u;
+    for (const [x, y, vx, vy, r] of splats.splice(0, 32)) {
+      u = use(P.splat);
+      gl.uniform1i(u.uTarget, bind(0, vel.read.tex));
+      gl.uniform1f(u.aspect, W / Hh); gl.uniform1f(u.radius, r);
+      gl.uniform2f(u.point, x, y); gl.uniform3f(u.value, vx, vy, 0);
+      run(P.splat, vel.write); vel.swap();
+    }
+    u = use(P.curl); gl.uniform1i(u.uVelocity, bind(0, vel.read.tex)); run(P.curl, crl);
+    u = use(P.vorticity);
+    gl.uniform1i(u.uVelocity, bind(0, vel.read.tex)); gl.uniform1i(u.uCurl, bind(1, crl.tex));
+    gl.uniform1f(u.curl, FLUID.curl * calm.curl); gl.uniform1f(u.dt, dt);
+    run(P.vorticity, vel.write); vel.swap();
+    u = use(P.divergence); gl.uniform1i(u.uVelocity, bind(0, vel.read.tex)); run(P.divergence, div);
+    u = use(P.scale); gl.uniform1i(u.uTexture, bind(0, prs.read.tex)); gl.uniform1f(u.value, .8);
+    run(P.scale, prs.write); prs.swap();
+    u = use(P.pressure); gl.uniform1i(u.uDivergence, bind(1, div.tex));
+    for (let i = 0; i < FLUID.pressureIters; i++) {
+      gl.uniform1i(u.uPressure, bind(0, prs.read.tex));
+      run(P.pressure, prs.write); prs.swap();
+    }
+    u = use(P.gradient);
+    gl.uniform1i(u.uPressure, bind(0, prs.read.tex)); gl.uniform1i(u.uVelocity, bind(1, vel.read.tex));
+    run(P.gradient, vel.write); vel.swap();
+    u = use(P.advect);
+    gl.uniform1i(u.uVelocity, bind(0, vel.read.tex)); gl.uniform1i(u.uSource, bind(0, vel.read.tex));
+    gl.uniform1f(u.dt, dt); gl.uniform1f(u.dissipation, calm.dissipation);
+    run(P.advect, vel.write); vel.swap();
+    u = use(P.ink);
+    gl.uniform1i(u.uVelocity, bind(0, vel.read.tex)); gl.uniform1i(u.uDisp, bind(1, ink.read.tex));
+    gl.uniform2fv(u.velTexel, vel.texel); gl.uniform1f(u.dt, dt); gl.uniform1f(u.relax, Math.exp(-calm.relax * dt));
+    run(P.ink, ink.write); ink.swap();
+  }
+
+  // ---------------------------------------------------------------- layout & textures
+  let W = innerWidth, Hh = innerHeight, glDpr = 1;
+  const nameEl = document.getElementById("name");
+  const beachEl = document.getElementById("beach");
+  const words = [document.getElementById("gh"), document.getElementById("li")];
+  const bottleEl = document.getElementById("mail");
+  const nameCanvas = document.createElement("canvas"), beachCanvas = document.createElement("canvas");
+  const nameTex = texture(1, 1, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));
+  const beachTex = texture(1, 1, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));
+  const world = { beachTop: 0, shore: 0, deepEnd: 0, bottle: [0, 0, 0], bottleScale: 1, rects: [] };
+
+  const hex = h => [1,3,5].map(i => parseInt(h.slice(i, i+2), 16) / 255);
+  {
+    const u = use(P.scene);
+    gl.uniform3fv(u.uBg0, hex(T.bg0)); gl.uniform3fv(u.uBg1, hex(T.bg1));
+    gl.uniform3fv(u.uText, hex(T.text)); gl.uniform3fv(u.uText2, hex(T.text2));
+    gl.uniform3fv(u.uCaus, hex(T.caus)); gl.uniform3fv(u.uFishCol, hex(T.fish)); gl.uniform3fv(u.uGlow, hex(T.glow));
+    gl.uniform1f(u.uCausBg, T.causBg); gl.uniform1f(u.uCausText, T.causText);
+    gl.uniform1f(u.uSpec, T.spec); gl.uniform1f(u.uDisp, T.disp); gl.uniform1f(u.uTextA, T.textA);
+    gl.uniform1f(u.uRefract, T.refract); gl.uniform1f(u.uGlowAmt, T.glowAmt); gl.uniform1f(u.uGrain, T.grain);
+    gl.uniform1f(u.uVig, T.vig);
+  }
+
+  const docRect = el => { const r = el.getBoundingClientRect(); return { x: r.left, y: r.top + scrollY, w: r.width, h: r.height }; };
+
+  // The name at its resting place (world coords = page coords): R crisp, G soft, B glow.
+  async function drawName() {
+    const cs = getComputedStyle(nameEl);
+    const size = parseFloat(cs.fontSize);
+    const font = `700 ${size}px "Fraunces"`;
+    try { await document.fonts.load(font, "tuna"); } catch (_) {}
+    const tdpr = Math.min(devicePixelRatio || 1, coarse ? 1.5 : 2);
+    nameCanvas.width = Math.round(W * tdpr); nameCanvas.height = Math.round(Hh * tdpr);
+    const c = nameCanvas.getContext("2d");
+    c.setTransform(tdpr, 0, 0, tdpr, 0, 0);
+    c.fillStyle = "#000"; c.fillRect(0, 0, W, Hh);
+    c.globalCompositeOperation = "lighter";
+    c.font = font; c.textAlign = "center"; c.textBaseline = "middle";
+    if ("letterSpacing" in c) c.letterSpacing = (parseFloat(cs.letterSpacing) || 0) + "px";
+    const r = docRect(nameEl);
+    const x = r.x + r.w/2, y = r.y + r.h/2 + size*.04;
+    const pass = (color, blur) => { c.filter = blur ? `blur(${blur}px)` : "none"; c.fillStyle = color; c.fillText("tuna", x, y); };
+    pass("#ff0000", 0); pass("#00ff00", size*.05); pass("#0000ff", size*.16);
+    c.filter = "none";
+    gl.bindTexture(gl.TEXTURE_2D, nameTex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, nameCanvas);
+  }
+
+  // The words in the sand, in the beach's own frame: R crisp groove, G soft groove.
+  async function drawBeach() {
+    const sample = words[0];
+    const size = parseFloat(getComputedStyle(sample).fontSize);
+    const font = `700 ${size}px "Caveat"`;
+    try { await document.fonts.load(font, "github linkedin"); } catch (_) {}
+    const tdpr = Math.min(devicePixelRatio || 1, coarse ? 1.5 : 2);
+    beachCanvas.width = Math.round(W * tdpr); beachCanvas.height = Math.round(Hh * tdpr);
+    const c = beachCanvas.getContext("2d");
+    c.setTransform(tdpr, 0, 0, tdpr, 0, 0);
+    c.fillStyle = "#000"; c.fillRect(0, 0, W, Hh);
+    c.globalCompositeOperation = "lighter";
+    c.font = font; c.textAlign = "center"; c.textBaseline = "middle";
+    world.rects = [];
+    for (const el of words) {
+      const r = docRect(el);
+      const cx = r.x + r.w / 2, cy = r.y + r.h / 2 - world.beachTop;
+      const rotDeg = parseFloat(getComputedStyle(el).getPropertyValue("--r")) || 0;
+      for (const [color, blur] of [["#ff0000", 0], ["#00ff00", size * .07]]) {
+        c.save(); c.translate(cx, cy + size * .06); c.rotate(rotDeg * Math.PI / 180);
+        c.filter = blur ? `blur(${blur}px)` : "none"; c.fillStyle = color; c.fillText(el.textContent, 0, 0);
+        c.restore();
+      }
+      world.rects.push([r.x - 16, r.y - 16, r.x + r.w + 16, r.y + r.h + 16]);
+    }
+    c.filter = "none";
+    gl.bindTexture(gl.TEXTURE_2D, beachTex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, beachCanvas);
+  }
+
+  function layout() {
+    W = innerWidth; Hh = innerHeight;
+    glDpr = Math.min(devicePixelRatio || 1, coarse ? 1 : 1.5);
+    canvas.width = Math.round(W * glDpr); canvas.height = Math.round(Hh * glDpr);
+    world.beachTop = docRect(beachEl).y;
+    world.shore = world.beachTop + Hh * .24;
+    world.deepEnd = Hh * 1.05;
+    const b = docRect(bottleEl);
+    world.bottle = [b.x + b.w / 2, b.y + b.h / 2, -20 * Math.PI / 180];
+    world.bottleScale = b.w / 112;
+    const u = use(P.scene);
+    gl.uniform2f(u.uSize, W, Hh); gl.uniform1f(u.uGlDpr, glDpr);
+    gl.uniform1f(u.uShore, world.shore); gl.uniform1f(u.uDeepEnd, world.deepEnd); gl.uniform1f(u.uBeachTop, world.beachTop);
+    gl.uniform1f(u.uBottleScale, world.bottleScale);
+    initFluid();
+    drawName(); drawBeach();
+  }
+
+  // ---- ripples (world coords) ----
+  const rip = new Float32Array(16 * 4);
+  for (let i = 0; i < 16; i++) rip[i*4 + 2] = -100;
+  let ripIdx = 0;
+  const t0 = performance.now() / 1000;
+  const now = () => performance.now() / 1000 - t0;
+  function addRipple(x, y, strength) {
+    rip.set([x, y, now(), strength], ripIdx * 4);
+    ripIdx = (ripIdx + 1) % 16;
+  }
+
+  // ---- the fish (world coords, lives in the river) ----
+  const fish = { x: -100, y: 0, a: 0, v: 120, phase: 0, target: null, retarget: 0, scaredUntil: 0, lastWake: 0 };
+  const ptr = { x: -1e4, y: -1e4, lastMove: -10, lx: 0, ly: 0, lastRip: 0, px: null, py: null };
+  const fishPts = new Float32Array(12 * 3);
+
+  function pickTarget(t) {
+    const r = docRect(nameEl);
+    const side = Math.random() < .5 ? -1 : 1;
+    fish.target = {
+      x: W/2 + side * (W * (.25 + Math.random() * .3)),
+      y: r.y + r.h * (.15 + Math.random() * .7) + (Math.random() < .25 ? (Math.random() - .5) * Hh * .6 : 0),
+    };
+    fish.retarget = t + 4 + Math.random() * 4;
+  }
+  function angleTo(cur, want, maxStep) {
+    let d = want - cur;
+    while (d > Math.PI) d -= 2 * Math.PI;
+    while (d < -Math.PI) d += 2 * Math.PI;
+    return cur + Math.max(-maxStep, Math.min(maxStep, d));
+  }
+  function stepFish(t, dt) {
+    const L = Math.max(42, Math.min(96, W * .052));
+    const m = 80;
+    const dxm = fish.x - ptr.x, dym = fish.y - ptr.y;
+    const dm = Math.hypot(dxm, dym) || 1;
+    if (dm < 150 + L && t - ptr.lastMove < .25 && t > fish.scaredUntil - .5) {
+      if (t > fish.scaredUntil) addRipple(fish.x, fish.y, .55);
+      fish.scaredUntil = t + .9;
+      fish.target = { x: fish.x + dxm / dm * 500, y: fish.y + dym / dm * 500 };
+      fish.retarget = t + 1.2;
+    }
+    const scared = t < fish.scaredUntil;
+    if (!fish.target || t > fish.retarget || Math.hypot(fish.target.x - fish.x, fish.target.y - fish.y) < 60) pickTarget(t);
+    let want = Math.atan2(fish.target.y - fish.y, fish.target.x - fish.x);
+    if (!scared && (fish.x < -m || fish.x > W + m || fish.y < -m || fish.y > Hh + m)) want = Math.atan2(Hh/2 - fish.y, W/2 - fish.x);
+    fish.a = angleTo(fish.a, want, (scared ? 7 : 1.6) * dt);
+    const vt = (scared ? 620 : 115) * (coarse ? .8 : 1);
+    fish.v += (vt - fish.v) * Math.min(1, dt * (scared ? 6 : 1.2));
+    fish.x += Math.cos(fish.a) * fish.v * dt;
+    fish.y += Math.sin(fish.a) * fish.v * dt;
+    fish.phase += dt * (5 + fish.v * .028);
+    if (fish.v > 260 && t - fish.lastWake > .12) { addRipple(fish.x, fish.y, .12); fish.lastWake = t; }
+    else if (t - fish.lastWake > 1.4) { addRipple(fish.x - Math.cos(fish.a) * L * .8, fish.y - Math.sin(fish.a) * L * .8, .05); fish.lastWake = t; }
+
+    // the fish drags the water (and any ink) along behind it
+    const sy = fish.y - scrollY;
+    if (fish.x > 0 && fish.x < W && sy > 0 && sy < Hh) {
+      const k = fish.v * dt * FLUID.force / Hh * .35;
+      splat(fish.x / W, 1 - sy / Hh, Math.cos(fish.a) * k, -Math.sin(fish.a) * k, .0012);
+    }
+
+    const ca = Math.cos(fish.a), sa = Math.sin(fish.a);
+    const amp = L * .07 * Math.min(1.6, .6 + fish.v / 300);
+    const toWorld = (lx, ly) => [fish.x + lx * ca - ly * sa, fish.y + lx * sa + ly * ca];
+    const local = [];
+    for (let i = 0; i < 8; i++) {
+      const s = i / 7;
+      const lx = -s * L * .82;
+      const ly = Math.sin(fish.phase - s * 3.2) * amp * s * s;
+      const r = L * (.03 + .1 * Math.pow(Math.sin(Math.min(1, s * 1.25 + .06) * Math.PI), .75));
+      local.push([lx, ly]);
+      const [wx, wy] = toWorld(lx, ly);
+      fishPts.set([wx, wy, Math.max(r, L * .018)], i * 3);
+    }
+    const [tx, ty] = local[7], [px, py] = local[6];
+    const ta = Math.atan2(ty - py, tx - px);
+    for (const [k, side] of [[8, 1], [9, -1]]) {
+      const aa = ta + side * .7;
+      const [wx, wy] = toWorld(tx + Math.cos(aa) * L * .24, ty + Math.sin(aa) * L * .24);
+      fishPts.set([wx, wy, L * .01], k * 3);
+    }
+    const [fx, fy] = local[2];
+    const flap = Math.sin(fish.phase * .5) * .2;
+    for (const [k, side] of [[10, 1], [11, -1]]) {
+      const aa = Math.PI - side * (1.15 + flap);
+      const [wx, wy] = toWorld(fx + Math.cos(aa) * L * .17, fy + Math.sin(aa) * L * .17);
+      fishPts.set([wx, wy, L * .012], k * 3);
+    }
+  }
+
+  // ---- input ----
+  addEventListener("pointermove", e => {
+    const t = now();
+    const wx = e.clientX, wy = e.clientY + scrollY;
+    const d = Math.hypot(wx - ptr.lx, wy - ptr.ly);
+    const speed = d / Math.max(t - ptr.lastMove, 1/120);
+    if (ptr.px !== null && nameVis() > .05) {
+      const mx = e.clientX - ptr.px, my = e.clientY - ptr.py;
+      const len = Math.hypot(mx, my);
+      if (len > 0 && len < 400) {
+        const c = Math.min(1, 36 / len); // cap a single flick
+        splat(e.clientX / W, 1 - e.clientY / Hh, mx * c / Hh * FLUID.force, -my * c / Hh * FLUID.force);
+      }
+    }
+    ptr.px = e.clientX; ptr.py = e.clientY;
+    ptr.x = wx; ptr.y = wy; ptr.lastMove = t;
+    if (d > 26 && t - ptr.lastRip > .04) {
+      addRipple(wx, wy, Math.min(.35, Math.max(.06, speed / 2600)));
+      ptr.lx = wx; ptr.ly = wy; ptr.lastRip = t;
+    }
+  });
+  function stone(x, y) { // screen coords
+    if (nameVis() > .05) {
+      const n = 10, r = 26;
+      for (let i = 0; i < n; i++) {
+        const a = i / n * Math.PI * 2;
+        splat((x + Math.cos(a) * r) / W, 1 - (y + Math.sin(a) * r) / Hh, Math.cos(a) * 560, -Math.sin(a) * 560, .0014);
+      }
+    }
+    addRipple(x, y + scrollY, 1.1);
+  }
+  addEventListener("pointerdown", e => {
+    if (e.target.closest("a")) return;
+    ptr.px = e.clientX; ptr.py = e.clientY;
+    ptr.x = e.clientX; ptr.y = e.clientY + scrollY; ptr.lastMove = now();
+    stone(e.clientX, e.clientY);
+  });
+  const lift = e => { if (e.pointerType !== "mouse") ptr.px = null; };
+  addEventListener("pointerup", lift);
+  addEventListener("pointercancel", lift);
+  document.addEventListener("pointerleave", () => { ptr.px = null; });
+
+  // ---- scrolling: the current carries the name downstream ----
+  const nameVis = () => 1 - Math.min(1, Math.max(0, (scrollY - Hh * .08) / (Hh * .5)));
+  let lastScroll = scrollY, lastScrollT = -10;
+  addEventListener("scroll", () => {
+    const d = scrollY - lastScroll; lastScroll = scrollY;
+    if (d > 0 && scrollY < Hh * .7) {
+      const r = nameEl.getBoundingClientRect();
+      const k = Math.min(d, 60) / Hh * FLUID.force * 1.4;
+      for (let i = 0; i < 6; i++) {
+        const x = r.left + r.width * (i + .5) / 6, y = r.top + r.height * (.25 + Math.random() * .5);
+        splat(x / W, 1 - y / Hh, k, -k * .15, .004);
+      }
+      lastScrollT = now();
+    }
+  }, { passive: true });
+
+  // ---- hovering the beach ----
+  let hoverIdx = -1, hoverAmt = 0, bottleLift = 0, bottleHover = false;
+  words.forEach((el, i) => {
+    const on = () => { hoverIdx = i; }, off = () => { if (hoverIdx === i) hoverIdx = -1; };
+    el.addEventListener("pointerenter", on); el.addEventListener("pointerleave", off);
+    el.addEventListener("focus", on); el.addEventListener("blur", off);
+  });
+  for (const [ev, v] of [["pointerenter", true], ["pointerleave", false], ["focus", true], ["blur", false]]) bottleEl.addEventListener(ev, () => { bottleHover = v; });
+  let shownRect = [0, 0, 0, 0];
+
+  function calmness(idle) {
+    const s = Math.min(1, Math.max(0, (idle - .4) / 1.2));
+    return { relax: .35 + s * 2.2, dissipation: FLUID.velDissipation + s * 3.5, curl: 1 - s };
+  }
+
+  function render(t, dt) {
+    hoverAmt += ((hoverIdx >= 0 ? 1 : 0) - hoverAmt) * Math.min(1, dt * 8);
+    if (hoverIdx >= 0) shownRect = world.rects[hoverIdx];
+    bottleLift += ((bottleHover ? 1 : 0) - bottleLift) * Math.min(1, dt * 7);
+    const [bx, by, ba] = world.bottle;
+    const rock = Math.sin(t * .9) * .03 + bottleLift * Math.sin(t * 3.1) * .04;
+
+    const u = use(P.scene);
+    gl.uniform1i(u.uTex, bind(0, nameTex));
+    gl.uniform1i(u.uDispMap, bind(1, fluidOK ? ink.read.tex : zeroTex));
+    gl.uniform1i(u.uBeachTex, bind(2, beachTex));
+    gl.uniform1f(u.uTime, t);
+    gl.uniform1f(u.uFlow, reduced ? 7 : t);
+    gl.uniform1f(u.uScroll, scrollY);
+    gl.uniform1f(u.uNameVis, nameVis());
+    gl.uniform4fv(u.uHoverRect, shownRect); gl.uniform1f(u.uHoverAmt, hoverAmt);
+    gl.uniform4f(u.uBottle, bx, by, ba + rock, bottleLift);
+    gl.uniform4fv(u.uRip, rip);
+    gl.uniform3fv(u.uFish, fishPts);
+    gl.uniform1f(u.uFishOn, reduced ? 0 : 1);
+    run(P.scene, null);
+  }
+
+  let last = 0;
+  function frame() {
+    const t = now();
+    const dt = Math.min(1/30, t - last); last = t;
+    if (!reduced) stepFish(t, dt);
+    if (scrollY < Hh * 1.2) stepFluid(dt, calmness(Math.min(t - ptr.lastMove, t - lastScrollT)));
+    render(t, dt);
+    requestAnimationFrame(frame);
+  }
+
+  // mockup-only hook so the scene can be stepped without a live mouse
+  window.__hero = {
+    splat, stone, fish,
+    step(dt, n = 1) { for (let i = 0; i < n; i++) { const t = now() + i * dt; stepFish(t, dt); stepFluid(dt, calmness(9)); render(t, dt); } },
+    hover(i) { hoverIdx = i; }, bottle(v) { bottleHover = v; },
+  };
+
+  fish.y = innerHeight * .4;
+  addEventListener("resize", layout);
+  layout();
+  document.fonts.ready.then(() => { drawName(); drawBeach(); });
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
