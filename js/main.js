@@ -60,7 +60,6 @@ function boot() {
   }
   // mobile browsers drop GL contexts (backgrounded tabs, GPU resets): show the plain page instead
   els.canvas.addEventListener("webglcontextlost", e => { e.preventDefault(); lost = true; htmlFallback(); });
-  document.body.classList.add("gl");
 
   const nameTex = G.texture(1, 1), beachTex = G.texture(1, 1);
   const texDpr = Math.min(devicePixelRatio || 1, ctx.coarse ? 1.5 : 2);
@@ -116,6 +115,9 @@ function boot() {
   if (DEBUG) window.__hero = debugApi(G, tick);
   document.fonts.ready.then(layout).then(() => {
     if (lost) return;
+    // the HTML name stays visible until the water can draw it (slow fonts must not blank the hero)
+    tick(now(), 0);
+    document.body.classList.add("gl");
     if (DEBUG) window.__hero.ready = true;
     else requestAnimationFrame(frame);
   });

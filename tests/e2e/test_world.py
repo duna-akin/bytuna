@@ -81,6 +81,18 @@ def test_fluid_shader_failure_falls_back_to_html(new_page, server):
     assert all("uCurl" not in e for e in errors), errors  # a warning, not an uncaught error
 
 
+def test_name_stays_visible_while_fonts_load(new_page, server):
+    page, errors = new_page()
+    page.route("**/*.woff2", lambda route: (page.wait_for_timeout(3000), route.continue_()))
+    page.goto(f"{server}/index.html?debug", wait_until="commit")
+    page.wait_for_timeout(800)
+    assert not page.evaluate("document.body.classList.contains('gl')")
+    assert page.eval_on_selector("#name", "e => getComputedStyle(e).color") != "rgba(0, 0, 0, 0)"
+    page.wait_for_function("window.__hero && window.__hero.ready", timeout=20_000)
+    assert page.evaluate("document.body.classList.contains('gl')")
+    assert errors == []
+
+
 def test_resize_realigns_world(site):
     site.open("?debug")
     before = site.state()["layouts"]
