@@ -16,7 +16,7 @@ export const SCROLL = { fadeStart: .08, fadeLength: .5, fluidUntil: 1.2, pushUnt
 
 export const WORLD = { shoreFrac: .24, deepEndFrac: 1.05, bottleAngleDeg: -20, bottleUnits: 112, wordPad: 16 };
 
-export const AUDIO = { volume: .5, fadeIn: 1.5, storageKey: "bytuna:muted", names: ["river", "surf", "swish", "plop"] };
+export const AUDIO = { volume: .25, fadeIn: 1.5, storageKey: "bytuna:muted", names: ["river", "surf", "swish", "plop"] };
 
 // time used for the current, light and waves when motion is reduced or frozen for tests
 export const FROZEN_TIME = 7;
