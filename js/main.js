@@ -6,6 +6,7 @@ import { createRipples } from "./ripples.js";
 import { drawName, drawBeach, docRect } from "./textures.js";
 import { createStirring } from "./stirring.js";
 import { fishFeature } from "./fish.js";
+import { beachFeature } from "./beach.js";
 
 const params = new URLSearchParams(location.search);
 const DEBUG = params.has("debug");
@@ -55,6 +56,7 @@ function boot() {
   const stirring = createStirring(ctx);
   ctx.features.push(stirring);
   ctx.features.push(fishFeature(ctx, stirring.splat));
+  ctx.features.push(beachFeature(ctx));
   // more features plug in here
 
   const nameTex = G.texture(1, 1), beachTex = G.texture(1, 1);
