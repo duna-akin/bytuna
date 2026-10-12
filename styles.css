@@ -14,7 +14,7 @@ main { position: relative; z-index: 1; }
   pointer-events: none; padding: 0 16px;
 }
 h1 {
-  font-weight: 700; letter-spacing: -0.015em;
+  font-family: "Fraunces Display", "Fraunces", serif; font-weight: 700; letter-spacing: -0.015em;
   font-size: clamp(96px, 28vw, 420px); line-height: .9;
   margin-top: -6vh; padding: 0 .08em;
   color: var(--accent);
