@@ -10,6 +10,7 @@ export function createStirring(ctx) {
   const fluid = createFluid(ctx.G, cfg);
   const { ptr } = ctx;
   let px = null, py = null, lx = 0, ly = 0, lastRip = 0, lastScroll = scrollY, active = true;
+  let simW = 0, simH = 0, resets = 0;
 
   addEventListener("pointermove", e => {
     const t = ctx.now();
@@ -81,12 +82,17 @@ export function createStirring(ctx) {
 
   return {
     splat: fluid.splat,
-    resize() { fluid.resize(ctx.W, ctx.H); },
+    resize() {
+      // a phone's address bar nudges the height while scrolling; rebuilding the grid would wipe the stir
+      if (ctx.W === simW && Math.abs(ctx.H - simH) < simH * .2) return;
+      simW = ctx.W; simH = ctx.H; resets++;
+      fluid.resize(ctx.W, ctx.H);
+    },
     update(t, dt) {
       active = scrollY < ctx.H * SCROLL.fluidUntil;
       if (active) fluid.step(dt, calmness(Math.min(t - ptr.lastMove, t - ctx.lastScrollT), cfg.velDissipation));
       ctx.F.inkTex = fluid.inkTex;
     },
-    state() { return { fluidOK: fluid.ok, fluidActive: active }; },
+    state() { return { fluidOK: fluid.ok, fluidActive: active, fluidResets: resets }; },
   };
 }

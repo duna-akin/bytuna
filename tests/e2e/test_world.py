@@ -93,6 +93,30 @@ def test_name_stays_visible_while_fonts_load(new_page, server):
     assert errors == []
 
 
+def test_canvas_matches_the_visible_viewport_not_100vh(new_page, server):
+    # phones: 100vh is the height *without* the address bar, innerHeight the height you actually see
+    page, errors = new_page()
+    page.add_init_script("addEventListener('DOMContentLoaded', () => { const s = document.createElement('style');"
+                         " s.textContent = 'canvas#water { height: 110vh; }'; document.head.append(s); })")
+    page.goto(f"{server}/index.html?debug")
+    page.wait_for_function("window.__hero && window.__hero.ready")
+    css_h, inner_h, buf_h = page.evaluate("[document.querySelector('#water').getBoundingClientRect().height, innerHeight,"
+                                          " document.querySelector('#water').height]")
+    assert css_h == inner_h == buf_h, (css_h, inner_h, buf_h)
+    assert errors == []
+
+
+def test_address_bar_height_changes_keep_the_stir(site):
+    site.open("?debug")
+    resets = site.state()["fluidResets"]
+    site.page.set_viewport_size({"width": 720, "height": 415})  # ~8% shorter: an address bar appearing
+    site.page.wait_for_function("__hero.state().layouts > 1")
+    assert site.state()["fluidResets"] == resets
+    site.page.set_viewport_size({"width": 600, "height": 415})  # a real resize still rebuilds the grid
+    site.page.wait_for_function("__hero.state().layouts > 2")
+    assert site.state()["fluidResets"] == resets + 1
+
+
 def test_resize_realigns_world(site):
     site.open("?debug")
     before = site.state()["layouts"]

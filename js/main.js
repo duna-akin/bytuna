@@ -69,6 +69,10 @@ function boot() {
     ctx.W = innerWidth;
     ctx.H = innerHeight;
     ctx.glDpr = Math.min(devicePixelRatio || 1, ctx.coarse ? 1 : 1.5);
+    // size from innerHeight, not CSS 100vh: on phones 100vh ignores the address bar,
+    // which would stretch the water relative to the page and its links
+    els.canvas.style.width = ctx.W + "px";
+    els.canvas.style.height = ctx.H + "px";
     els.canvas.width = Math.round(ctx.W * ctx.glDpr);
     els.canvas.height = Math.round(ctx.H * ctx.glDpr);
     const w = ctx.world;
@@ -111,7 +115,13 @@ function boot() {
     requestAnimationFrame(frame);
   }
 
-  addEventListener("resize", layout);
+  // address bars fire resize repeatedly while scrolling: lay out at most once per frame
+  let pending = false;
+  addEventListener("resize", () => {
+    if (pending) return;
+    pending = true;
+    requestAnimationFrame(() => { pending = false; layout(); });
+  });
   if (DEBUG) window.__hero = debugApi(G, tick);
   document.fonts.ready.then(layout).then(() => {
     if (lost) return;
