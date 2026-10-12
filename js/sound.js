@@ -10,14 +10,16 @@ export function setupSound(button, on) {
   sync();
   button.hidden = false;
 
-  const unlock = () => {
+  // Browsers only let audio start inside a real gesture, and which events count differs
+  // (Escape never does; iOS prefers touchend). Keep trying on every gesture until it runs.
+  const gestures = ["pointerdown", "pointerup", "touchend", "click", "keydown"];
+  const unlock = async () => {
     audio.unlock();
     audio.setProgress(progress());
-    removeEventListener("pointerdown", unlock, true);
-    removeEventListener("keydown", unlock, true);
+    await audio.resume();
+    if (audio.state === "running") for (const g of gestures) removeEventListener(g, unlock, true);
   };
-  addEventListener("pointerdown", unlock, true);
-  addEventListener("keydown", unlock, true);
+  for (const g of gestures) addEventListener(g, unlock, true);
 
   button.addEventListener("click", () => { audio.setMuted(!audio.muted); sync(); });
   addEventListener("scroll", () => audio.setProgress(progress()), { passive: true });

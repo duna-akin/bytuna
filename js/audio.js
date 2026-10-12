@@ -87,7 +87,7 @@ export function createAudio({ cfg, base = "audio/", storage = safeStorage() }) {
       if (buffers) fadeTo(v ? 0 : 1, .4);
     },
     suspend() { ctx?.suspend(); },
-    resume() { ctx?.resume(); },
+    resume() { return ctx ? ctx.resume() : Promise.resolve(); },
     get muted() { return muted; },
     get started() { return !!ctx; },
     get state() { return ctx ? ctx.state : "none"; },

@@ -16,6 +16,24 @@ def test_keydown_unlocks_audio(site):
     assert audio(site)["started"] is True
 
 
+STRICT_AUTOPLAY = """
+const Real = window.AudioContext;
+window.AudioContext = class extends Real {
+  constructor(...a) { super(...a); super.suspend(); }      // starts blocked, like a real browser
+  resume() { return navigator.userActivation.isActive ? super.resume() : Promise.resolve(); }
+};
+"""
+
+
+def test_audio_recovers_when_first_key_is_not_a_gesture(site):
+    site.page.add_init_script(STRICT_AUTOPLAY)
+    site.open("?debug")
+    site.page.keyboard.press("Escape")  # not a user activation: the context stays suspended
+    site.page.wait_for_timeout(200)
+    site.page.mouse.click(5, 5)
+    site.page.wait_for_function("__hero.state().audio.state === 'running'", timeout=5_000)
+
+
 def test_mute_toggle_persists(site):
     site.open("?debug")
     btn = site.page.locator("#sound")
