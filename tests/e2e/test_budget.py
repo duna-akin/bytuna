@@ -9,6 +9,16 @@ def test_code_weight_under_120kb():
     assert total < 120_000, f"HTML+CSS+JS is {total} bytes"
 
 
+def test_sand_writing_uses_gloria_hallelujah(new_page, server):
+    page, errors = new_page()
+    page.goto(f"{server}/index.html")
+    family = page.eval_on_selector("#gh", "e => getComputedStyle(e).fontFamily")
+    assert family.startswith('"Gloria Hallelujah"'), family
+    faces = page.evaluate("document.fonts.load('400 64px \"Gloria Hallelujah\"', 'github linkedin').then(fs => fs.map(f => f.status))")
+    assert faces and all(s == "loaded" for s in faces), faces
+    assert errors == []
+
+
 def test_fonts_are_self_hosted_and_small(new_page, server):
     page, errors = new_page()
     sizes, external = {}, []

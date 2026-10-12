@@ -1,6 +1,6 @@
 :root {
   --bg: #03141c; --ink: #cfe7e6; --dim: #5f8a8c; --accent: #7ff0e4; --sand-ink: #7a6448;
-  --sand-font: "Fraunces", serif; --sand-weight: 600; --sand-style: italic;
+  --sand-font: "Gloria Hallelujah", cursive; --sand-weight: 400; --sand-style: normal;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { background: var(--bg); }

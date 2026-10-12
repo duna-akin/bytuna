@@ -56,4 +56,4 @@ def main(families):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:] or ["Fraunces:ital,wght@0,400;0,700;1,400;1,600", "JetBrains+Mono:wght@400"])
+    main(sys.argv[1:] or ["Fraunces:ital,wght@0,400;0,700;1,400", "JetBrains+Mono:wght@400", "Gloria+Hallelujah"])
