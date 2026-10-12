@@ -42,31 +42,31 @@ function boot() {
   const audio = setupSound(document.querySelector("#sound"), ctx.on);
   ctx.features.push({ state: () => ({ audio: { started: audio.started, muted: audio.muted, state: audio.state, ready: audio.ready } }) });
 
-  const G =params.has("nogl") ? null : createGL(els.canvas);
-  let scene = null;
-  if (G) {
-    try { scene = createScene(G, THEME); } catch (err) { console.warn("WebGL scene unavailable:", err); }
+  const G = params.has("nogl") ? null : createGL(els.canvas);
+  if (!G) return htmlFallback();
+  let scene, lost = false;
+  try {
+    scene = createScene(G, THEME);
+    ctx.G = G;
+    ctx.ripples = createRipples(now);
+    ctx.F = { inkTex: null, hoverRect: [0, 0, 0, 0], hoverAmt: 0, bottleLift: 0, fishPts: new Float32Array(36), fishOn: 0 };
+    const stirring = createStirring(ctx);
+    ctx.features.push(stirring);
+    ctx.features.push(fishFeature(ctx, stirring.splat));
+    ctx.features.push(beachFeature(ctx));
+  } catch (err) {
+    console.warn("WebGL unavailable:", err);
+    return htmlFallback();
   }
-  if (!scene) {
-    els.canvas.hidden = true;
-    if (DEBUG) window.__hero = { ready: true, state: () => featureState({ gl: false }) };
-    return;
-  }
+  // mobile browsers drop GL contexts (backgrounded tabs, GPU resets): show the plain page instead
+  els.canvas.addEventListener("webglcontextlost", e => { e.preventDefault(); lost = true; htmlFallback(); });
   document.body.classList.add("gl");
-  ctx.G = G;
-  ctx.ripples = createRipples(now);
-  ctx.F = { inkTex: null, hoverRect: [0, 0, 0, 0], hoverAmt: 0, bottleLift: 0, fishPts: new Float32Array(36), fishOn: 0 };
-
-  const stirring = createStirring(ctx);
-  ctx.features.push(stirring);
-  ctx.features.push(fishFeature(ctx, stirring.splat));
-  ctx.features.push(beachFeature(ctx));
-  // more features plug in here
 
   const nameTex = G.texture(1, 1), beachTex = G.texture(1, 1);
   const texDpr = Math.min(devicePixelRatio || 1, ctx.coarse ? 1.5 : 2);
 
   async function layout() {
+    if (lost) return;
     ctx.W = innerWidth;
     ctx.H = innerHeight;
     ctx.glDpr = Math.min(devicePixelRatio || 1, ctx.coarse ? 1 : 1.5);
@@ -105,6 +105,7 @@ function boot() {
 
   let last = now();
   function frame() {
+    if (lost) return;
     const t = now();
     tick(t, Math.min(1 / 30, t - last)); // a long pause (hidden tab) must not become one giant step
     last = t;
@@ -114,9 +115,17 @@ function boot() {
   addEventListener("resize", layout);
   if (DEBUG) window.__hero = debugApi(G, tick);
   document.fonts.ready.then(layout).then(() => {
+    if (lost) return;
     if (DEBUG) window.__hero.ready = true;
     else requestAnimationFrame(frame);
   });
+}
+
+// Without (or after losing) WebGL, the HTML itself is the page: visible name, plain links.
+function htmlFallback() {
+  els.canvas.hidden = true;
+  document.body.classList.remove("gl");
+  if (DEBUG) window.__hero = { ready: true, state: () => featureState({ gl: false }) };
 }
 
 function featureState(base) {

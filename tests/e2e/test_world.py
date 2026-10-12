@@ -48,6 +48,39 @@ def test_nogl_shows_plain_html(new_page, server):
     assert errors == []
 
 
+def html_fallback_showing(page):
+    return page.evaluate("""() => !document.body.classList.contains('gl')
+        && document.querySelector('#water').hidden
+        && getComputedStyle(document.querySelector('#name')).color !== 'rgba(0, 0, 0, 0)'""")
+
+
+def test_lost_webgl_context_brings_back_the_html(new_page, server):
+    page, errors = new_page()
+    page.goto(f"{server}/index.html?debug")
+    page.wait_for_function("window.__hero && window.__hero.ready")
+    page.evaluate("document.querySelector('#water').getContext('webgl2').getExtension('WEBGL_lose_context').loseContext()")
+    page.wait_for_timeout(100)
+    assert html_fallback_showing(page)
+    assert errors == []
+
+
+def test_fluid_shader_failure_falls_back_to_html(new_page, server):
+    page, errors = new_page()
+    page.add_init_script("""
+        const compile = WebGL2RenderingContext.prototype.compileShader;
+        const source = WebGL2RenderingContext.prototype.shaderSource;
+        const broken = new WeakSet();
+        WebGL2RenderingContext.prototype.shaderSource = function (s, src) {
+          if (src.includes('uCurl')) broken.add(s);   // the vorticity pass fails on this "driver"
+          return source.call(this, s, broken.has(s) ? 'not glsl' : src);
+        };
+    """)
+    page.goto(f"{server}/index.html?debug")
+    page.wait_for_function("window.__hero && window.__hero.ready")
+    assert html_fallback_showing(page)
+    assert all("uCurl" not in e for e in errors), errors  # a warning, not an uncaught error
+
+
 def test_resize_realigns_world(site):
     site.open("?debug")
     before = site.state()["layouts"]
