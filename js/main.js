@@ -4,6 +4,7 @@ import { createGL } from "./gl.js";
 import { createScene } from "./scene.js";
 import { createRipples } from "./ripples.js";
 import { drawName, drawBeach, docRect } from "./textures.js";
+import { createStirring } from "./stirring.js";
 
 const params = new URLSearchParams(location.search);
 const DEBUG = params.has("debug");
@@ -50,7 +51,9 @@ function boot() {
   ctx.ripples = createRipples(now);
   ctx.F = { inkTex: null, hoverRect: [0, 0, 0, 0], hoverAmt: 0, bottleLift: 0, fishPts: new Float32Array(36), fishOn: 0 };
 
-  // features plug in here (later tasks)
+  const stirring = createStirring(ctx);
+  ctx.features.push(stirring);
+  // more features plug in here
 
   const nameTex = G.texture(1, 1), beachTex = G.texture(1, 1);
   const texDpr = Math.min(devicePixelRatio || 1, ctx.coarse ? 1.5 : 2);
