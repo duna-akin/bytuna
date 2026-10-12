@@ -10,6 +10,14 @@ def test_audio_waits_for_first_interaction(site):
     assert audio(site)["started"] is True
 
 
+def test_audio_plays_at_half_volume(site):
+    site.open("?debug")
+    site.page.mouse.click(5, 5)
+    site.page.wait_for_function("__hero.state().audio.ready", timeout=20_000)
+    site.page.wait_for_timeout(2000)  # past the 1.5 s fade-in
+    assert abs(audio(site)["level"] - .5) < .01, audio(site)["level"]
+
+
 def test_keydown_unlocks_audio(site):
     site.open("?debug")
     site.page.keyboard.press("Tab")

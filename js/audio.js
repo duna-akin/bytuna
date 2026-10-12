@@ -55,7 +55,7 @@ export function createAudio({ cfg, base = "audio/", storage = safeStorage() }) {
         buffers = { river, surf, swish, plop };
         loop(river, riverGain);
         loop(surf, surfGain);
-        fadeTo(muted ? 0 : 1, cfg.fadeIn);
+        fadeTo(muted ? 0 : cfg.volume, cfg.fadeIn);
       })
       .catch(err => console.warn("audio unavailable:", err));
   }
@@ -79,7 +79,7 @@ export function createAudio({ cfg, base = "audio/", storage = safeStorage() }) {
     setMuted(v) {
       muted = v;
       writeMuted(storage, cfg.storageKey, v);
-      if (buffers) fadeTo(v ? 0 : 1, .4);
+      if (buffers) fadeTo(v ? 0 : cfg.volume, .4);
     },
     suspend() { ctx?.suspend(); },
     resume() { return ctx ? ctx.resume() : Promise.resolve(); },
@@ -87,5 +87,6 @@ export function createAudio({ cfg, base = "audio/", storage = safeStorage() }) {
     get started() { return !!ctx; },
     get state() { return ctx ? ctx.state : "none"; },
     get ready() { return !!buffers; },
+    get level() { return master ? master.gain.value : 0; },
   };
 }

@@ -40,7 +40,7 @@ boot();
 
 function boot() {
   const audio = setupSound(document.querySelector("#sound"), ctx.on);
-  ctx.features.push({ state: () => ({ audio: { started: audio.started, muted: audio.muted, state: audio.state, ready: audio.ready } }) });
+  ctx.features.push({ state: () => ({ audio: { started: audio.started, muted: audio.muted, state: audio.state, ready: audio.ready, level: audio.level } }) });
 
   const G = params.has("nogl") ? null : createGL(els.canvas);
   if (!G) return htmlFallback();
