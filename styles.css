@@ -80,3 +80,15 @@ h1 {
 }
 @media (prefers-reduced-motion: reduce) { .here { animation: none; } }
 canvas#water[hidden] { display: none; }
+.sound {
+  position: fixed; right: 16px; bottom: max(16px, env(safe-area-inset-bottom)); z-index: 3;
+  width: 36px; height: 36px; border: 0; border-radius: 50%; cursor: pointer;
+  display: grid; place-items: center;
+  background: rgba(3, 20, 28, .35); color: rgba(207, 231, 230, .45);
+  transition: color .2s;
+}
+.sound:hover, .sound:focus-visible { color: var(--ink); }
+.sound:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sound svg { width: 18px; height: 18px; fill: currentColor; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+.sound[aria-pressed="true"] .on, .sound[aria-pressed="false"] .off { display: none; }
+.sound[hidden] { display: none; }

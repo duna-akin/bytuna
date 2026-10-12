@@ -7,6 +7,7 @@ import { drawName, drawBeach, docRect } from "./textures.js";
 import { createStirring } from "./stirring.js";
 import { fishFeature } from "./fish.js";
 import { beachFeature } from "./beach.js";
+import { setupSound } from "./sound.js";
 
 const params = new URLSearchParams(location.search);
 const DEBUG = params.has("debug");
@@ -38,7 +39,10 @@ const ctx = {
 boot();
 
 function boot() {
-  const G = params.has("nogl") ? null : createGL(els.canvas);
+  const audio = setupSound(document.querySelector("#sound"), ctx.on);
+  ctx.features.push({ state: () => ({ audio: { started: audio.started, muted: audio.muted, state: audio.state, ready: audio.ready } }) });
+
+  const G =params.has("nogl") ? null : createGL(els.canvas);
   let scene = null;
   if (G) {
     try { scene = createScene(G, THEME); } catch (err) { console.warn("WebGL scene unavailable:", err); }

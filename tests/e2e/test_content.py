@@ -29,6 +29,12 @@ def test_no_corner_labels_or_instructions(site):
     assert site.page.locator(".corner, #hint").count() == 0
 
 
+def test_mute_button_is_the_only_button(site):
+    site.open()
+    assert site.page.locator("button").count() == 1
+    assert site.page.get_attribute("button", "aria-label") == "Mute sound"
+
+
 def test_phone_has_no_horizontal_scroll(new_page, server):
     page, errors = new_page(viewport={"width": 390, "height": 844})
     page.goto(f"{server}/index.html")
