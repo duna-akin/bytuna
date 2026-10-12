@@ -1,5 +1,5 @@
 import { AUDIO } from "./config.js";
-import { scrollProgress } from "./logic.js";
+import { scrollProgress, createSwishTrigger } from "./logic.js";
 import { createAudio } from "./audio.js";
 
 // The mute button, the first-gesture unlock, scroll crossfade and hidden-tab pause.
@@ -24,7 +24,8 @@ export function setupSound(button, on) {
   button.addEventListener("click", () => { audio.setMuted(!audio.muted); sync(); });
   addEventListener("scroll", () => audio.setProgress(progress()), { passive: true });
   document.addEventListener("visibilitychange", () => (document.hidden ? audio.suspend() : audio.resume()));
-  on("stir", speed => audio.swish(speed, performance.now() / 1000));
+  const stroke = createSwishTrigger(); // one swish per stir stroke, not per mouse event
+  on("stir", (speed, t) => { const gain = stroke(speed, t); if (gain) audio.swish(gain); });
   on("stone", () => audio.plop());
   return audio;
 }

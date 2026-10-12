@@ -42,6 +42,25 @@ export function equalPowerGains(p) {
 
 export const swishGain = speed => clamp(speed / 1500, 0, 1) * .5;
 
+// A swish marks the start of a stir stroke. Feed it every pointer speed (px/s) with its
+// time (s); it returns a gain when a stroke begins, else 0. Slow drift never reaches the
+// onset, a continuous stroke fires once, and it re-arms only after the pointer slows or rests.
+export function createSwishTrigger({ onset = 700, release = 300, refractory = .5, tau = .08, rest = .25 } = {}) {
+  let smooth = 0, lastT = null, lastFire = -Infinity, armed = true;
+  return (speed, t) => {
+    const dt = lastT === null ? Infinity : Math.max(0, t - lastT);
+    lastT = t;
+    if (dt > rest) armed = true; // no events for a while: the pointer was still
+    const k = 1 - Math.exp(-dt / tau);
+    smooth += (speed - smooth) * k;
+    if (smooth < release) armed = true;
+    if (!armed || smooth < onset || t - lastFire < refractory) return 0;
+    armed = false;
+    lastFire = t;
+    return swishGain(smooth);
+  };
+}
+
 export function readMuted(storage, key) {
   try { return storage?.getItem(key) === "1"; } catch { return false; }
 }

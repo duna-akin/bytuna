@@ -34,6 +34,30 @@ def test_audio_recovers_when_first_key_is_not_a_gesture(site):
     site.page.wait_for_function("__hero.state().audio.state === 'running'", timeout=5_000)
 
 
+COUNT_SHOTS = """
+window.__shots = 0;
+const start = AudioBufferSourceNode.prototype.start;
+AudioBufferSourceNode.prototype.start = function (...a) { if (!this.loop) window.__shots++; return start.apply(this, a); };
+"""
+
+
+def test_swish_marks_strokes_not_every_movement(site):
+    site.page.add_init_script(COUNT_SHOTS)
+    site.open("?debug")
+    site.page.mouse.click(5, 5)  # unlock audio (its stone plop is counted, so reset below)
+    site.page.wait_for_function("__hero.state().audio.ready", timeout=20_000)
+    site.page.mouse.move(150, 200)  # (Playwright teleports the cursor; settle before measuring)
+    site.page.wait_for_timeout(400)
+    site.page.evaluate("window.__shots = 0")
+    for i in range(60):  # slow drift across the hero
+        site.page.mouse.move(150 + i * 3, 200)
+        site.page.wait_for_timeout(30)
+    assert site.page.evaluate("window.__shots") == 0
+    site.page.wait_for_timeout(400)
+    site.page.mouse.move(650, 260, steps=25)  # one quick stroke
+    assert site.page.evaluate("window.__shots") == 1
+
+
 def test_mute_toggle_persists(site):
     site.open("?debug")
     btn = site.page.locator("#sound")

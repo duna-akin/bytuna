@@ -1,11 +1,11 @@
-import { equalPowerGains, swishGain, readMuted, writeMuted } from "./logic.js";
+import { equalPowerGains, readMuted, writeMuted } from "./logic.js";
 
 const safeStorage = () => { try { return window.localStorage; } catch { return null; } };
 
 // River murmur at the top crossfades into surf at the beach; swishes and plops on top.
 // Nothing is created until the first user gesture (browsers block audio before that).
 export function createAudio({ cfg, base = "audio/", storage = safeStorage() }) {
-  let ctx = null, master, riverGain, surfGain, buffers = null, lastSwish = -1, progress = 0;
+  let ctx = null, master, riverGain, surfGain, buffers = null, progress = 0;
   let muted = readMuted(storage, cfg.storageKey);
   const ext = new Audio().canPlayType('audio/webm; codecs="opus"') ? "webm" : "mp3";
 
@@ -74,12 +74,7 @@ export function createAudio({ cfg, base = "audio/", storage = safeStorage() }) {
   return {
     unlock,
     setProgress(p) { progress = p; applyProgress(); },
-    swish(speed, nowSeconds) {
-      const g = swishGain(speed);
-      if (g < .02 || nowSeconds - lastSwish < cfg.swishGap) return;
-      lastSwish = nowSeconds;
-      oneShot(buffers?.swish, g, .9 + Math.random() * .2);
-    },
+    swish(gain) { oneShot(buffers?.swish, gain, .9 + Math.random() * .2); },
     plop() { oneShot(buffers?.plop, .8, 2 ** ((Math.random() * 400 - 200) / 1200)); },
     setMuted(v) {
       muted = v;

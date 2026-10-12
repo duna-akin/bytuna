@@ -10,20 +10,23 @@ export function createStirring(ctx) {
   const fluid = createFluid(ctx.G, cfg);
   const { ptr } = ctx;
   let px = null, py = null, lx = 0, ly = 0, lastRip = 0, lastScroll = scrollY, active = true;
-  let simW = 0, simH = 0, resets = 0;
+  let simW = 0, simH = 0, resets = 0, lastEvent = null;
 
   addEventListener("pointermove", e => {
     const t = ctx.now();
     const wx = e.clientX, wy = e.clientY + scrollY;
     const d = Math.hypot(wx - lx, wy - ly);
     const speed = d / Math.max(t - ptr.lastMove, 1 / 120);
+    // true pointer speed between consecutive events (drives the swish)
+    const moveSpeed = lastEvent ? Math.hypot(e.clientX - lastEvent.x, e.clientY - lastEvent.y) / Math.max((e.timeStamp - lastEvent.t) / 1000, 1 / 240) : 0;
+    lastEvent = { x: e.clientX, y: e.clientY, t: e.timeStamp };
     if (px !== null && ctx.nameVis > .05) {
       const mx = e.clientX - px, my = e.clientY - py;
       if (Math.hypot(mx, my) < 400) {
         const [cx, cy] = capFlick(mx, my, cfg.flickCap);
         if (cx || cy) fluid.splat(e.clientX / ctx.W, 1 - e.clientY / ctx.H, cx / ctx.H * cfg.force, -cy / ctx.H * cfg.force);
       }
-      ctx.emit("stir", speed);
+      ctx.emit("stir", moveSpeed, e.timeStamp / 1000);
     }
     px = e.clientX; py = e.clientY;
     ptr.x = wx; ptr.y = wy; ptr.lastMove = t;

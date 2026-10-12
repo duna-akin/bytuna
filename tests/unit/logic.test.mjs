@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   calmness, nameVisibility, gridFor, angleTo, capFlick, rippleStrength,
-  scrollProgress, equalPowerGains, swishGain, readMuted, writeMuted,
+  scrollProgress, equalPowerGains, swishGain, readMuted, writeMuted, createSwishTrigger,
 } from "../../js/logic.js";
 import { SCROLL, FLUID } from "../../js/config.js";
 
@@ -58,6 +58,47 @@ test("equalPowerGains keeps total power constant", () => {
 
 test("swishGain grows with speed and caps at .5", () => {
   close(swishGain(0), 0); close(swishGain(750), .25); close(swishGain(1e5), .5);
+});
+
+// feed `speedAt(t)` at 60 events/s for `secs`, starting at t0; return the swish gains that fired
+function run(trigger, speedAt, secs, t0 = 0) {
+  const fired = [];
+  for (let i = 0; i < secs * 60; i++) {
+    const t = t0 + i / 60;
+    const g = trigger(speedAt(t, i), t);
+    if (g > 0) fired.push(g);
+  }
+  return fired;
+}
+
+test("slow drift never swishes", () => {
+  assert.equal(run(createSwishTrigger(), () => 300, 3).length, 0);
+});
+
+test("one fast stroke swishes once, not continuously", () => {
+  const fired = run(createSwishTrigger(), () => 1500, 3);
+  assert.equal(fired.length, 1);
+  assert.ok(fired[0] > .2 && fired[0] <= .5);
+});
+
+test("separate strokes each swish", () => {
+  const trigger = createSwishTrigger();
+  // fast for .3 s, then still for .7 s, three times
+  const fired = run(trigger, t => (t % 1 < .3 ? 1500 : 0), 3);
+  assert.equal(fired.length, 3);
+});
+
+test("a stroke after the pointer rested swishes even without slow events in between", () => {
+  const trigger = createSwishTrigger();
+  assert.equal(run(trigger, () => 1500, .3, 0).length, 1);
+  assert.equal(run(trigger, () => 1500, .3, 2).length, 1); // events resume 1.7 s later
+});
+
+test("erratic jitter is capped", () => {
+  let seed = 1;
+  const rand = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const fired = run(createSwishTrigger(), () => rand() * 3000, 3);
+  assert.ok(fired.length <= 4, `fired ${fired.length}`);
 });
 
 test("mute preference survives broken storage", () => {
