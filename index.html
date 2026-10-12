@@ -1,70 +1,36 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>tuna akin</title>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>tuna</title>
+<meta name="description" content="Tuna Akın, student @ Laf who builds things." />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <canvas id="water" aria-hidden="true"></canvas>
 
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link
-            href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap"
-            rel="stylesheet"
-        />
+  <main>
+    <section class="hero">
+      <h1 id="name">tuna</h1>
+      <section class="entry" aria-label="definition">
+        <div class="head"><span class="word">tu·na</span><span class="pron">/ˈtuː.nə/</span><span class="pos">noun</span></div>
+        <ol>
+          <li><span>a large, fast, restless fish.</span></li>
+          <li><span><span class="lang">Turkish.</span> the Danube, Europe's second-longest river.</span></li>
+          <li class="me"><span>Tuna Akın, student @ Laf who builds things.<span class="here">← you are here</span></span></li>
+        </ol>
+      </section>
+    </section>
 
-        <link rel="stylesheet" href="styles.css" />
-    </head>
-    <body style="background-color: rgb(13, 13, 13); font-family: Inter">
-        <div id="app"></div>
+    <div class="passage" aria-hidden="true"></div>
 
-        <script src="https://unpkg.com/react@18.3.1/umd/react.development.js"></script>
-        <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"></script>
-        <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
-
-        <!-- tweaks panel -->
-        <script type="text/babel" src="tweaks-panel/style.js"></script>
-        <script type="text/babel" src="tweaks-panel/useTweaks.js"></script>
-        <script type="text/babel" src="tweaks-panel/panel-position.js"></script>
-        <script type="text/babel" src="tweaks-panel/panel-deck-rail.js"></script>
-        <script type="text/babel" src="tweaks-panel/panel-protocol.js"></script>
-        <script type="text/babel" src="tweaks-panel/layout.jsx"></script>
-        <script type="text/babel" src="tweaks-panel/TweaksPanel.jsx"></script>
-        <script type="text/babel" src="tweaks-panel/TweakSlider.jsx"></script>
-        <script type="text/babel" src="tweaks-panel/TweakToggle.jsx"></script>
-        <script type="text/babel" src="tweaks-panel/TweakSelect.jsx"></script>
-        <script type="text/babel" src="tweaks-panel/TweakRadio.jsx"></script>
-        <script type="text/babel" src="tweaks-panel/TweakText.jsx"></script>
-        <script type="text/babel" src="tweaks-panel/TweakNumber.jsx"></script>
-        <script type="text/babel" src="tweaks-panel/TweakColor.jsx"></script>
-        <script type="text/babel" src="tweaks-panel/TweakButton.jsx"></script>
-
-        <!-- site data -->
-        <script type="text/babel" src="src/data/projects.js"></script>
-        <script type="text/babel" src="src/data/posts.js"></script>
-
-        <!-- terminal hero -->
-        <script type="text/babel" src="src/terminal/terminal-commands.js"></script>
-        <script type="text/babel" src="src/terminal/PromptLine.jsx"></script>
-        <script type="text/babel" src="src/terminal/Hero.jsx"></script>
-
-        <!-- sections -->
-        <script type="text/babel" src="src/sections/SectionHead.jsx"></script>
-        <script type="text/babel" src="src/sections/ProjectRow.jsx"></script>
-        <script type="text/babel" src="src/sections/Projects.jsx"></script>
-        <script type="text/babel" src="src/sections/PostRow.jsx"></script>
-        <script type="text/babel" src="src/sections/Blog.jsx"></script>
-        <script type="text/babel" src="src/sections/Contact.jsx"></script>
-
-        <!-- page chrome -->
-        <script type="text/babel" src="src/layout/TopBar.jsx"></script>
-        <script type="text/babel" src="src/layout/Footer.jsx"></script>
-
-        <!-- routing -->
-        <script type="text/babel" src="src/routing.js"></script>
-
-        <!-- theme + app entry -->
-        <script type="text/babel" src="src/theme/theme.js"></script>
-        <script type="text/babel" src="src/app.jsx"></script>
-        <script type="text/babel" src="src/main.jsx"></script>
-    </body>
+    <section class="beach" id="beach" aria-label="find me">
+      <a class="carve" id="gh" href="https://github.com/duna-akin">github</a>
+      <a class="carve" id="li" href="https://www.linkedin.com/in/tuna-akin/">linkedin</a>
+      <a class="bottle" id="mail" href="mailto:tuna.akin@protonmail.com" aria-label="email tuna.akin@protonmail.com"><span>✉ email</span></a>
+      <p class="addr">tuna.akin@protonmail.com</p>
+    </section>
+  </main>
+</body>
 </html>
