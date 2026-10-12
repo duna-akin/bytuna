@@ -1,6 +1,28 @@
 PHONE = {"viewport": {"width": 390, "height": 844}, "is_mobile": True, "has_touch": True}
 
 
+def test_beach_items_never_overlap(new_page, server):
+    boxes_js = """() => Object.fromEntries(['#gh', '#li', '#mail', '.addr'].map(s => {
+        const r = document.querySelector(s).getBoundingClientRect();
+        return [s, [r.left, r.top + scrollY, r.right, r.bottom + scrollY]];
+    }))"""
+    for w, h in ((320, 568), (360, 640), (375, 667), (390, 844), (412, 915), (720, 450), (1280, 720)):
+        page, errors = new_page(viewport={"width": w, "height": h})
+        page.goto(f"{server}/index.html")
+        page.evaluate("document.fonts.ready.then(() => true)")
+        page.focus("#mail")  # reveals the address where it actually shows
+        page.wait_for_timeout(600)
+        boxes = page.evaluate(boxes_js)
+        names = list(boxes)
+        for i, a in enumerate(names):
+            for b in names[i + 1:]:
+                ax0, ay0, ax1, ay1 = boxes[a]
+                bx0, by0, bx1, by1 = boxes[b]
+                overlap = min(ax1, bx1) > max(ax0, bx0) and min(ay1, by1) > max(ay0, by0)
+                assert not overlap, f"{a} overlaps {b} at {w}x{h}: {boxes[a]} vs {boxes[b]}"
+        assert errors == []
+
+
 def test_phone_layout_and_resolution(new_page, server):
     page, errors = new_page(**PHONE)
     page.goto(f"{server}/index.html?debug")
