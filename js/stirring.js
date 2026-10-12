@@ -44,15 +44,25 @@ export function createStirring(ctx) {
     ctx.emit("stone");
   }
 
+  // A mouse click drops a stone at once. A finger might be starting a scroll, so it only
+  // counts as a tap if it lifts without moving and without the browser cancelling it.
+  let tap = null;
   addEventListener("pointerdown", e => {
-    if (e.target.closest("a, button")) return;
+    if (e.target.closest?.("a, button")) return;
     px = e.clientX; py = e.clientY;
     ptr.x = e.clientX; ptr.y = e.clientY + scrollY; ptr.lastMove = ctx.now();
-    stone(e.clientX, e.clientY);
+    if (e.pointerType === "mouse") stone(e.clientX, e.clientY);
+    else tap = { id: e.pointerId, x: e.clientX, y: e.clientY };
   });
-  const lift = e => { if (e.pointerType !== "mouse") px = null; };
-  addEventListener("pointerup", lift);
-  addEventListener("pointercancel", lift);
+  addEventListener("pointermove", e => {
+    if (tap && e.pointerId === tap.id && Math.hypot(e.clientX - tap.x, e.clientY - tap.y) > 10) tap = null;
+  });
+  addEventListener("pointerup", e => {
+    if (tap && e.pointerId === tap.id) stone(tap.x, tap.y);
+    tap = null;
+    if (e.pointerType !== "mouse") px = null;
+  });
+  addEventListener("pointercancel", () => { tap = null; px = null; });
   addEventListener("pointerout", e => { if (!e.relatedTarget) px = null; }); // left the window
 
   addEventListener("scroll", () => {

@@ -145,6 +145,7 @@ function debugApi(G, tick) {
       for (let i = 0; i < n; i++) { manualT += 1 / fps; tick(manualT, 1 / fps); }
     },
     freeze(on = true) { ctx.frozen = on; },
+    on: ctx.on,
     region(x, y, w, h) {
       const { px } = read(x, y, w, h);
       const s = [0, 0, 0];
